@@ -24,8 +24,9 @@ MDD10AMotorShield::MDD10AMotorShield(unsigned char M1DIR, unsigned char M1PWM,
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-void MDD10AMotorShield::init()
+void MDD10AMotorShield::init( ros::NodeHandle *nh)
 {
+  this->nh=nh;
 // Define pinMode for the pins and set the frequency for timer1.
 
   pinMode(_M1DIR,OUTPUT);
@@ -33,12 +34,14 @@ void MDD10AMotorShield::init()
   pinMode(_M2DIR,OUTPUT);
   pinMode(_M2PWM,OUTPUT);
 
+  inputToMotorFactor = float(MAX_PWM) / MOTOR_INPUT_LIMIT; //   // 51 / 80
+
   /*#if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__)
   // Timer 1 configuration
   // prescaler: clockI/O / 1
   // outputs enabled
   // phase-correct PWM
-  // top of 400
+  // top of MOTOR_INPUT_LIMIT
   //
   // PWM frequency calculation
   // 16MHz / 1 (prescaler) / 2 (phase-correct) / 400 (top) = 20kHz
@@ -48,6 +51,9 @@ void MDD10AMotorShield::init()
   #endif
   */
 }
+
+
+
 // Set speed for motor 1, speed is a number betwenn -400 and 400
 void MDD10AMotorShield::setM1Speed(int speed)
 {
@@ -63,16 +69,20 @@ void MDD10AMotorShield::setM1Speed(int speed)
     speed = -speed;  // Make speed a positive quantity
     reverse = 1;  // Preserve the direction
   }
-  if (speed > 400)  // Max PWM dutycycle
-    speed = 400;
+  if (speed > MAX_PWM)  // Max PWM dutycycle
+    speed = MAX_PWM;
+    
  /* #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__)
   OCR1A = speed;
   #else*/
-  #if 0
-  float debugValue = speed * 51 / 80;
-  Serial.println(debugValue);
+  #if ROS_LOG_ENABLED
+  //int debugValue = speed * inputToMotorFactor;
+  //Serial.println(debugValue);
+  //sprintf(log_msg, "setM1Speed (%d)", debugValue);
+  //(*nh).loginfo(log_msg);
   #endif
-  analogWrite(_M1PWM,speed * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  
+  analogWrite(_M1PWM,speed * inputToMotorFactor); // default to using analogWrite, mapping MOTOR_INPUT_LIMIT to 255
   //#endif
   if (reverse)
     digitalWrite(_M1DIR,HIGH);
@@ -80,7 +90,7 @@ void MDD10AMotorShield::setM1Speed(int speed)
     digitalWrite(_M1DIR,LOW);
 }
 
-// Set speed for motor 2, speed is a number betwenn -400 and 400
+// Set speed for motor 2, speed is a number betwenn -MOTOR_INPUT_LIMIT and MOTOR_INPUT_LIMIT
 void MDD10AMotorShield::setM2Speed(int speed)
 {
 //  #ifdef DEBUG_MOTOR
@@ -95,12 +105,12 @@ void MDD10AMotorShield::setM2Speed(int speed)
     speed = -speed;  // Make speed a positive quantity
     reverse = 1;  // Preserve the direction
   }
-  if (speed > 400)  // Max PWM dutycycle
-    speed = 400;
+  if (speed > MAX_PWM)  // Max PWM dutycycle
+    speed = MAX_PWM;
  /* #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__)
   OCR1B = speed;
   #else*/
-  analogWrite(_M2PWM,speed * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  analogWrite(_M2PWM,speed * inputToMotorFactor); // default to using analogWrite, mapping 400 to 255
   //#endif
   if (reverse)
     digitalWrite(_M2DIR,HIGH);

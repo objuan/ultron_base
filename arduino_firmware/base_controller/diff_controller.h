@@ -16,20 +16,21 @@ typedef struct {
   double TargetTicksPerFrame;    // target speed in ticks per frame
   long Encoder;                  // encoder count
   long PrevEnc;                  // last encoder count
+  long Delta;
 
   /*
   * Using previous input (PrevInput) instead of PrevError to avoid derivative kick,
   * see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-derivative-kick/
   */
   int PrevInput;                // last input
-  //int PrevErr;                   // last error
+  int PrevErr;                   // last error
 
   /*
   * Using integrated term (ITerm) instead of integrated error (Ierror),
   * to allow tuning changes,
   * see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-tuning-changes/
   */
-  //int Ierror;
+  int Ierror;
   int ITerm;                    //integrated term
 
   long output;                    // last motor setting
@@ -57,14 +58,14 @@ unsigned char moving = 0; // is the base in motion?
 */
 void resetPID(){
    leftPID.TargetTicksPerFrame = 0.0;
-   leftPID.Encoder = readEncoder(LEFT);
+   leftPID.Encoder = readEncoder(MOTOR_LEFT);
    leftPID.PrevEnc = leftPID.Encoder;
    leftPID.output = 0;
    leftPID.PrevInput = 0;
    leftPID.ITerm = 0;
 
    rightPID.TargetTicksPerFrame = 0.0;
-   rightPID.Encoder = readEncoder(RIGHT);
+   rightPID.Encoder = readEncoder(MOTOR_RIGHT);
    rightPID.PrevEnc = rightPID.Encoder;
    rightPID.output = 0;
    rightPID.PrevInput = 0;
@@ -72,7 +73,38 @@ void resetPID(){
 }
 
 /* PID routine to compute the next motor commands */
-void doPID(SetPointInfo * p) {
+
+void doPID(SetPointInfo * p,float frameFimeFactor){
+  long Perror;
+  long output;
+
+ // p->TargetTicksPerFrame = 200;
+
+  p->Delta = p->Encoder-p->PrevEnc;
+  Perror = p->TargetTicksPerFrame - ( p->Delta);
+          
+  // Derivative error is the delta Perror
+  output = frameFimeFactor * (Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko;
+  
+  p->PrevErr = Perror;
+  p->PrevEnc = p->Encoder;
+  
+  output += p->output;   
+  // Accumulate Integral error *or* Limit output.
+  // Stop accumulating when output saturates
+  if (output >= MOTOR_INPUT_LIMIT)
+    output = MOTOR_INPUT_LIMIT;
+  else if (output <= -MOTOR_INPUT_LIMIT)
+    output = -MOTOR_INPUT_LIMIT;
+  else
+    p->Ierror += Perror;
+
+ // output = 100;
+  
+  p->output = output;
+}
+
+void doPID_bo(SetPointInfo * p) {
   long Perror;
   long output;
   int input;
@@ -90,30 +122,32 @@ void doPID(SetPointInfo * p) {
   //output = (Kp * Perror + Kd * (Perror - p->PrevErr) + Ki * p->Ierror) / Ko;
   // p->PrevErr = Perror;
   output = (Kp * Perror - Kd * (input - p->PrevInput) + p->ITerm) / Ko;
+
+//  
   p->PrevEnc = p->Encoder;
 
   output += p->output;
   // Accumulate Integral error *or* Limit output.
   // Stop accumulating when output saturates
-  if (output >= MAX_PWM)
-    output = MAX_PWM;
-  else if (output <= -MAX_PWM)
-    output = -MAX_PWM;
+  if (output >= MOTOR_INPUT_LIMIT)
+    output = MOTOR_INPUT_LIMIT;
+  else if (output <= -MOTOR_INPUT_LIMIT)
+    output = -MOTOR_INPUT_LIMIT;
   else
   /*
   * allow turning changes, see http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-tuning-changes/
   */
     p->ITerm += Ki * Perror;
-
+  
   p->output = output;
   p->PrevInput = input;
 }
 
 /* Read the encoder values and call the PID routine */
-void updatePID() {
+void updatePID(float deltaTimeMS) {
   /* Read the encoders */
-  leftPID.Encoder = readEncoder(LEFT);
-  rightPID.Encoder = readEncoder(RIGHT);
+  leftPID.Encoder = readEncoder(MOTOR_LEFT);
+  rightPID.Encoder = readEncoder(MOTOR_RIGHT);
 
   #ifdef DEBUG_ENC
   Serial.print("L:");
@@ -134,9 +168,11 @@ void updatePID() {
     return;
   }
 
+  float frameFimeFactor= deltaTimeMS / PID_INTERVAL_FLOAT;
+  
   /* Compute PID update for each motor */
-  doPID(&rightPID);
-  doPID(&leftPID);
+  doPID(&rightPID,frameFimeFactor);
+  doPID(&leftPID,frameFimeFactor);
 
   /* Set the motor speeds accordingly */
   setMotorSpeeds(leftPID.output, rightPID.output);

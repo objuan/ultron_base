@@ -17,7 +17,7 @@
 
   /* Wrap the encoder reading function */
   long readEncoder(int i) {
-    if (i == LEFT) {
+    if (i == MOTOR_LEFT) {
       left_enc_pos = left_enc.read() - left_enc_pos_base;
       return left_enc_pos;
     }
@@ -30,7 +30,7 @@
 
   /* Wrap the encoder reset function */
   void resetEncoder(int i) {
-    if (i == LEFT){
+    if (i == MOTOR_LEFT){
       left_enc_pos=0L;
       left_enc_pos_base = left_enc.read();
       return;
@@ -43,8 +43,8 @@
 
 /* Wrap the encoder reset function */
 void resetEncoders() {
-  resetEncoder(LEFT);
-  resetEncoder(RIGHT);
+  resetEncoder(MOTOR_LEFT);
+  resetEncoder(MOTOR_RIGHT);
 }
 
 
