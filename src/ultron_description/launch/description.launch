@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="laser_enabled" default="$(optenv ULTRON_LMS1XX_ENABLED false)"/>
+  <arg name="ur5_enabled" default="$(optenv ULTRON_UR5_ENABLED false)"/>
+  <arg name="kinect_enabled" default="false"/>
+
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(env ULTRON_DESCRIPTION)'
+    laser_enabled:=$(arg laser_enabled)
+    ur5_enabled:=$(arg ur5_enabled)
+    kinect_enabled:=$(arg kinect_enabled)
+    " />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+</launch>

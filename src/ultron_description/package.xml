@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>ultron_description</name>
+  <version>0.0.1</version>
+  <description>Clearpath Ultron URDF description</description>
+
+  <author email="cecchinimarco71@gmain.com">Marco Cecchini</author>
+
+  <maintainer email="cecchinimarco71@gmain.com">Marco Cecchini </maintainer>
+
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>xacro</run_depend>
+  <run_depend>ur_description</run_depend>
+  <run_depend>lms1xx</run_depend>
+
+
+  <export>
+  </export>
+</package>

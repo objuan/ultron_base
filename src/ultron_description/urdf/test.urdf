@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<robot name="ultron_robot_test" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF/XACRO Files -->
+
+  <xacro:include filename="$(find ultron_description)/urdf/wheel.urdf.xacro" />
+
+  <xacro:include filename="$(find ultron_description)/urdf/accessories/kinect_camera.urdf.xacro"/>
+  <xacro:include filename="$(find ultron_description)/urdf/accessories/sick_lms1xx_mount.urdf.xacro"/>
+  <xacro:include filename="$(find ultron_description)/urdf/accessories/sensor_arch.urdf.xacro"/>
+  <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
+
+  <property name="M_PI" value="3.14159"/>
+
+  <!-- Base Size -->
+  <property name="base_x_size" value="0.98740000" />
+  <property name="base_y_size" value="0.57090000" />
+  <property name="base_z_size" value="0.24750000" />
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+    </visual>
+  </link>
+	
+</robot>
