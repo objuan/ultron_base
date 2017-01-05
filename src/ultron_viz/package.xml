@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <name>ultron_viz</name>
+  <version>0.2.2</version>
+  <description>Visualization configuration for Clearpath Ultron</description>
+
+  <author email="rgariepy@clearpathrobotics.com">Ryan Gariepy</author>
+  <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
+
+  <maintainer email="pbovbel@clearpathrobotics.com">Paul Bovbel</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/ultron_viz</url>
+  <url type="bugtracker">https://github.com/ultron/ultron_desktop/issues</url>
+  <url type="repository">https://github.com/husly/ultron_desktop</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslaunch</build_depend>
+
+  <run_depend>ultron_description</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>rviz_imu_plugin</run_depend>
+
+  <export>
+  </export>
+</package>
