@@ -1,0 +1,74 @@
+
+aggiunto pacchetto 
+
+-sudo apt-get install ros-kinetic-moveit
+-https://github.com/ros-teleop/twist_mux
+	source /opt/ros/kinetic/setup.bash
+
+- https://github.com/ros-industrial/universal_robot.git
+tolte dipendenza da muve.it e kinneatic dal paccheto !!!
+
+- https://github.com/cra-ros-pkg/robot_localization.git
+
+- https://github.com/ros-geographic-info/geographic_info.git
+
+- https://github.com/ros-visualization/interactive_marker_twist_server.git
+
+- https://github.com/ros-teleop/teleop_twist_joy.git
+
+
+// UTLITA
+
+vedere TF
+
+ - rosrun tf view_frames 
+ fa un  PDF
+
+// ========================= PRIMA DI PARTIRE =============
+
+setup del file di modello, fatto in automatico con source devel/setup.sh
+
+sh /home/marco/petrorov/ultron_ws/src/ultron/ultron_description/env-hooks/50.ultron_description.sh
+
+
+// ==================================
+Petrorov base
+// ==================================
+
+lancio arduino
+
+$ roslaunch ultron_kernel arduino.launch port:=/dev/ttyUSB0
+
+lancio con arduino
+$ roslaunch ultron_kernel base.launch 
+
+
+lancio senza arduino
+$ roslaunch ultron_kernel base_nohw.launch 
+
+Now plug in a joystick, and in another terminal, run:
+
+$ roslaunch ultron_teleop teleop.launch
+
+Hold button 1 (the deadman switch) and you should be driving. 
+
+// ================================================
+
+roscore
+rosparam set enable_odom_tf true
+rosparam set use_sim_time true
+roslaunch ultron_viz view_robot.launch
+roslaunch ultron_navigation gmapping_demo.launch 
+rosbag play --clock file.bag
+
+// ============
+
+// ================================================
+
+Simulating Ultron
+
+export ULTRON_GAZEBO_DESCRIPTION=$(rospack find ultron_gazebo)/urdf/description.gazebo.xacro
+
+roslaunch ultron_gazebo ultron_empty_world.launch world_name:=worlds/willowgarage.world
+
+roslaunch ultron_gazebo ultron_empty_world.launch
