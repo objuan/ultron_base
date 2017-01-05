@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="laser_enabled" default="false"/>
+  <arg name="ur5_enabled" default="false"/>
+  <arg name="kinect_enabled" default="false"/>
+  <arg name="imu_enabled" default="false" />
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find ultron_gazebo)/launch/ultron_empty_world.launch">
+    <arg name="world_name" value="$(find ultron_gazebo)/worlds/base_playpen.world"/>
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="ur5_enabled" value="$(arg ur5_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+  </include>
+
+</launch>
