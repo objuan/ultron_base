@@ -28,7 +28,8 @@ void SensorManager:: init(ros::NodeHandle *nh)
 {
   this->nh=nh;
 
-  float RANGE_SENSOR_RATE = 0.1;
+  // in HZ
+  float RANGE_SENSOR_RATE = 10;
   if (nh != NULL)
   {
     nh->getParam("~range_sensor_rate", &RANGE_SENSOR_RATE, 1);
@@ -41,7 +42,7 @@ void SensorManager:: init(ros::NodeHandle *nh)
      range_msg.min_range = 0.02;
      range_msg.max_range = MAX_RANGE_CM * 0.01;
   }
-  polling_rate_ms = RANGE_SENSOR_RATE * 1000;
+  polling_rate_ms = 1000 / RANGE_SENSOR_RATE;
   lastTime = millis();
 
   const char *input = RANGE_SENSOR_LIST;

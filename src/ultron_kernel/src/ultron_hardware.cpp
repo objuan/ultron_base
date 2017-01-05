@@ -20,9 +20,9 @@ namespace ultron_kernel
     :
     nh_(nh),
     private_nh_(private_nh),
-    system_status_task_(ultron_status_msg_),
-    power_status_task_(ultron_status_msg_),
-    safety_status_task_(ultron_status_msg_),
+   // system_status_task_(ultron_status_msg_),
+   // power_status_task_(ultron_status_msg_),
+  //  safety_status_task_(ultron_status_msg_),
     software_status_task_(ultron_status_msg_, target_control_freq)
   {
     private_nh_.param<double>("wheel_diameter", wheel_diameter_, 0.3555);

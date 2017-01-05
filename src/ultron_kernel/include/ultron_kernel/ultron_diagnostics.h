@@ -4,7 +4,6 @@
 
 #include "ros/ros.h"
 #include "diagnostic_updater/diagnostic_updater.h"
-#include "ultron_kernel/horizon_legacy_wrapper.h"
 #include "ultron_kernel/RobotStatus.h"
 
 namespace ultron_kernel
@@ -36,19 +35,20 @@ namespace ultron_kernel
 
     void run(diagnostic_updater::DiagnosticStatusWrapper &stat)
     {
-      typename horizon_legacy::Channel<T>::Ptr latest = horizon_legacy::Channel<T>::requestData(1.0);
-      if (latest)
-      {
-        update(stat, latest);
-      }
+	//TODO
+     // typename horizon_legacy::Channel<T>::Ptr latest = horizon_legacy::Channel<T>::requestData(1.0);
+     // if (latest)
+    //  {
+     //   update(stat, latest);
+     // }
     }
 
-    void update(diagnostic_updater::DiagnosticStatusWrapper &stat, typename horizon_legacy::Channel<T>::Ptr &status);
+//    void update(diagnostic_updater::DiagnosticStatusWrapper &stat, typename horizon_legacy::Channel<T>::Ptr &status);
 
   private:
     ultron_kernel::RobotStatus &msg_;
   };
-
+/*
   template<>
   UltronHardwareDiagnosticTask<clearpath::DataSystemStatus>::UltronHardwareDiagnosticTask(ultron_kernel::RobotStatus &msg);
 
@@ -73,6 +73,7 @@ namespace ultron_kernel
   void UltronHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::update(
     diagnostic_updater::DiagnosticStatusWrapper &stat,
     horizon_legacy::Channel<clearpath::DataSafetySystemStatus>::Ptr &status);
+*/
 
 }  // namespace ultron_kernel
 #endif  // ultron_kernel_ultron_DIAGNOSTICS_H

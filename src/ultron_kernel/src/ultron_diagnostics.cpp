@@ -26,7 +26,7 @@ namespace
 
 namespace ultron_kernel
 {
-
+/*
   template<>
   UltronHardwareDiagnosticTask<clearpath::DataSystemStatus>::UltronHardwareDiagnosticTask(ultron_kernel::RobotStatus &msg)
     :
@@ -184,7 +184,7 @@ namespace ultron_kernel
       stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Safety System Warning");
     }
   }
-
+*/
   UltronSoftwareDiagnosticTask::UltronSoftwareDiagnosticTask(ultron_kernel::RobotStatus &msg, double target_control_freq)
     :
     DiagnosticTask("software_status"),

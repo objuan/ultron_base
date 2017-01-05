@@ -75,9 +75,9 @@ namespace ultron_kernel
     ros::Publisher diagnostic_publisher_;
     ultron_kernel::RobotStatus ultron_status_msg_;
     diagnostic_updater::Updater diagnostic_updater_;
-    UltronHardwareDiagnosticTask<clearpath::DataSystemStatus> system_status_task_;
-    UltronHardwareDiagnosticTask<clearpath::DataPowerSystem> power_status_task_;
-    UltronHardwareDiagnosticTask<clearpath::DataSafetySystemStatus> safety_status_task_;
+  //  UltronHardwareDiagnosticTask<clearpath::DataSystemStatus> system_status_task_;
+  //  UltronHardwareDiagnosticTask<clearpath::DataPowerSystem> power_status_task_;
+  //  UltronHardwareDiagnosticTask<clearpath::DataSafetySystemStatus> safety_status_task_;
     UltronSoftwareDiagnosticTask software_status_task_;
 
     // ROS Parameters

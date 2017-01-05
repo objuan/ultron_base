@@ -25,7 +25,7 @@ char tmp_msg1[100];
 char tmp_msg2[100];
 char tmp_msg3[100];
 
-float DIAGNOSTIC_RATE;
+//float DIAGNOSTIC_RATE;
 long lastDiagnosticTime;
 long diagnostic_rate_ms;
 
@@ -296,9 +296,9 @@ bool _firstLoop = true;
 
 void first_loop() {
 
-  DIAGNOSTIC_RATE= 1;
+  float DIAGNOSTIC_RATE= 1; // 1 al secondo
   nh.getParam("~diagnostic_rate", &DIAGNOSTIC_RATE, 1);
-  diagnostic_rate_ms = DIAGNOSTIC_RATE * 1000;
+  diagnostic_rate_ms = 1000 / DIAGNOSTIC_RATE;
   lastDiagnosticTime = millis();
 
   //MOTOR
