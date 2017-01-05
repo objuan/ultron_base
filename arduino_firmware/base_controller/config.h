@@ -7,8 +7,9 @@
 //#define DEBUG_MOTOR 1
 //#define DEBUG_BATTERY 1
 //#define DEBUG_ENC 1
+//#define DEBUG_RANGE 1
 
-#if (DEBUG_MOTOR) || (DEBUG_BATTERY) || (DEBUG_ENC)
+#if (DEBUG_MOTOR) || (DEBUG_BATTERY) || (DEBUG_ENC) || (DEBUG_RANGE)
   #define DEBUG_MODE 1
 #endif
 
@@ -39,13 +40,14 @@
 //    ROS
 // =========================
 
-#define ROVER_NAME "PETROROV V1.0"
+#define ROBOT_NAME "PETROROV V1.0"
 
 #define ROS_TOPIC_VELOCITY_IN "/petrorov/cmd_vel"
 #define ROS_TOPIC_CONNECT "/petrorov/base/connect"
 
 #define ROS_TOPIC_SENSOR "/petrorov/base/sensor_value"
 #define ROS_TOPIC_MOTOR_STATE "/petrorov/base/motor_state"
+#define ROS_TOPIC_RANGE_SENSOR "/petrorov/base/range"
 
 #define ROS_TOPIC_GET_INFO_SRV "/petrorov/base/srv/getInfo"
 #define ROS_TOPIC_RESET_POS_SRV "/petrorov/base/srv/resetPos"
@@ -125,6 +127,14 @@
 #define BATTERY_PIN_ANAG_A A0
 #define BATTERY_PIN_ANAG_B A1
 
+
+// =========================
+// ULTRASONIC
+// =========================
+
+//  (Trig PIN,Echo PIN,NAME)
+//#define RANGE_SENSOR_LIST      "4,5,FRONT,6,7,BACK"
+#define RANGE_SENSOR_LIST      "24,22,/ultrasound_front"
 
 // =======================
 

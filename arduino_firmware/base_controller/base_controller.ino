@@ -8,12 +8,13 @@
 #include <rosserial_arduino/Adc.h>
 #include <sensor_msgs/BatteryState.h>
 #include <geometry_msgs/Twist.h>
-#include <husky_base/GetRoverInfo.h>
-#include <husky_base/RoverOdom.h>
-#include <husky_base/ResetPosition.h>
+#include <ultron_kernel/GetRobotInfo.h>
+#include <ultron_kernel/RobotOdom.h>
+#include <ultron_kernel/RobotCommand.h>
 
 #include "config.h"
 #include "motor_controller.h"
+#include "sensors.h"
 
 // ----------------
 
@@ -95,13 +96,15 @@ int averageAnalog(int pin){
   return v/4;
 }
 
+SensorManager sensorManager;
+
 // ----------------
 //  MOTOR 
 // ----------------
 /*
  * La velocità arriva in metri/secondo, devo convertire questa velocità in 
  */
-husky_base::RoverOdom odom_msg;
+ultron_kernel::RobotOdom odom_msg;
 ros::Publisher motor_state_pub(ROS_TOPIC_MOTOR_STATE, &odom_msg);
 
 MotorController motorController;
@@ -111,7 +114,7 @@ MotorController motorController;
 // twist_msg.linear.x = LEFT MOTOR
 // twist_msg.linear.y = RIGHT MOTOR
 // values are in m/sec
-void cmd_vel_callback( const husky_base::RoverOdom& move_msg) {
+void cmd_vel_callback( const ultron_kernel::RobotOdom& move_msg) {
  #ifdef ROS_LOG_ENABLED
   dtostrf(move_msg.left_speed,4,3,tmp_msg1);
   dtostrf(move_msg.right_speed,4,3,tmp_msg2);
@@ -123,51 +126,51 @@ void cmd_vel_callback( const husky_base::RoverOdom& move_msg) {
   motorController.setVelocity(move_msg.left_speed,move_msg.right_speed);
 }
 
-ros::Subscriber<husky_base::RoverOdom> cmd_vel_topic(ROS_TOPIC_VELOCITY_IN, &cmd_vel_callback);
+ros::Subscriber<ultron_kernel::RobotOdom> cmd_vel_topic(ROS_TOPIC_VELOCITY_IN, &cmd_vel_callback);
 
 // ----------------
 //  SERVICE
 // ----------------
 
 // GET INFO SERVICE
-const char* rover_name = ROVER_NAME;
+const char* Robot_name = ROBOT_NAME;
 
-void GetRoverInfo_callback(const husky_base::GetRoverInfo::Request & req, husky_base::GetRoverInfo::Response & res){
-  res.info.name=rover_name; // ARDUINO STRING WORKAROUND
+void GetRobotInfo_callback(const ultron_kernel::GetRobotInfo::Request & req, ultron_kernel::GetRobotInfo::Response & res){
+  res.info.name=Robot_name; // ARDUINO STRING WORKAROUND
   res.info.wheel_diameter = motorController.WHEEL_DIAMETER;
   
-  //nh.loginfo("GetRoverInfo_callback");
+  //nh.loginfo("GetRobotInfo_callback");
 }
 
-ros::ServiceServer<husky_base::GetRoverInfo::Request, husky_base::GetRoverInfo::Response> state_srv(ROS_TOPIC_GET_INFO_SRV,&GetRoverInfo_callback);
+ros::ServiceServer<ultron_kernel::GetRobotInfo::Request, ultron_kernel::GetRobotInfo::Response> state_srv(ROS_TOPIC_GET_INFO_SRV,&GetRobotInfo_callback);
 
 
 // RESET SERVICE
 
-void ResetPosition_callback(const husky_base::ResetPosition::Request & req, husky_base::ResetPosition::Response & res){
+void ResetPosition_callback(const ultron_kernel::RobotCommand::Request & req, ultron_kernel::RobotCommand::Response & res){
     
   motorController.reset_cmd();
   nh.loginfo("ResetPosition_callback");
 }
 
-ros::ServiceServer<husky_base::ResetPosition::Request, husky_base::ResetPosition::Response> reset_position_srv(ROS_TOPIC_RESET_POS_SRV,&ResetPosition_callback);
+ros::ServiceServer<ultron_kernel::RobotCommand::Request, ultron_kernel::RobotCommand::Response> reset_position_srv(ROS_TOPIC_RESET_POS_SRV,&ResetPosition_callback);
 
 // STOP SERVICE
 
-void Stop_callback(const husky_base::ResetPosition::Request & req, husky_base::ResetPosition::Response & res){
+void Stop_callback(const ultron_kernel::RobotCommand::Request & req, ultron_kernel::RobotCommand::Response & res){
     
   motorController.stopAll();
   nh.loginfo("Stop_callback");
 }
 
-ros::ServiceServer<husky_base::ResetPosition::Request, husky_base::ResetPosition::Response> stop_srv(ROS_TOPIC_STOP_SRV,&Stop_callback);
+ros::ServiceServer<ultron_kernel::RobotCommand::Request, ultron_kernel::RobotCommand::Response> stop_srv(ROS_TOPIC_STOP_SRV,&Stop_callback);
 
 
 // ----------------
 //  Service Client
 // ----------------
 
-ros::ServiceClient<husky_base::ResetPosition::Request, husky_base::ResetPosition::Response> connect_client(ROS_TOPIC_CONNECT);
+ros::ServiceClient<ultron_kernel::RobotCommand::Request, ultron_kernel::RobotCommand::Response> connect_client(ROS_TOPIC_CONNECT);
 
 // ----------------
 //  setup
@@ -184,7 +187,9 @@ void setup() {
  #endif
 
 #ifdef DEBUG_MODE
-  drive.init();
+  //motorController.init(NULL);
+ 
+  sensorManager.init(NULL);
   return;
  #endif
   
@@ -220,6 +225,10 @@ void setup() {
   nh.advertiseService(stop_srv);
 
   nh.serviceClient(connect_client);
+
+  //SENSORS
+
+  sensorManager.setup(&nh);
 
   // info
   nh.loginfo("PETROROV Serial setup complete");
@@ -268,6 +277,12 @@ void loop_debug(){
   
 #endif
 
+#ifdef DEBUG_RANGE
+  sensorManager.dump();
+   delay(100);
+
+#endif
+
 }
 
 
@@ -288,6 +303,10 @@ void first_loop() {
 
   //MOTOR
   motorController.init(&nh);
+
+  // SENSORS
+
+  sensorManager.init(&nh);
   
     // ports
   drive.init(&nh);
@@ -299,8 +318,8 @@ void first_loop() {
   
     // call parent service
 /*
-    husky_base::ResetPosition::Request request;
-    husky_base::ResetPosition::Response response;
+    ultron_kernel::ResetPosition::Request request;
+    ultron_kernel::ResetPosition::Response response;
 
     connect_client.call(request,response);
     bool ok = response.retCode;
@@ -346,10 +365,14 @@ void loop() {
   //MOTOR
 
   motorController.tick();
-
+  
   // PUB STATE
 
   motorController.publishSpace(motor_state_pub);
+
+  // SENSORS
+
+  sensorManager.tick();
   
   // DIAGNOSTIC
 

@@ -3,7 +3,7 @@
 
 #include <ros.h>
 //#include <geometry_msgs/Twist.h>
-#include <husky_base/RoverOdom.h>
+#include <ultron_kernel/RobotOdom.h>
 
 #include "MDD10AMotorShieldV1.0.h"
 #include "encoder_driver.h"
@@ -53,14 +53,16 @@ void MotorController:: init(ros::NodeHandle *nh)
   MAX_SPEED = 1;
   POLLING_TIMEOUT = 2;
   //MOTOR_CONTROLLER_RATE = 10;
-  
-  nh->getParam("~wheel_diameter", &WHEEL_DIAMETER, 1);
-  nh->getParam("~max_acceleration", &MAX_ACCELERATION, 1);
-  nh->getParam("~max_speed", &MAX_SPEED, 1);
-  nh->getParam("~polling_timeout", &POLLING_TIMEOUT, 1);
- // nh->getParam("~motor_controller_rate", &MOTOR_CONTROLLER_RATE, 1);
-  //WHEEL_DIAMETER = 0.15;
 
+  if (nh != NULL)
+  {
+    nh->getParam("~wheel_diameter", &WHEEL_DIAMETER, 1);
+    nh->getParam("~max_acceleration", &MAX_ACCELERATION, 1);
+    nh->getParam("~max_speed", &MAX_SPEED, 1);
+    nh->getParam("~polling_timeout", &POLLING_TIMEOUT, 1);
+   // nh->getParam("~motor_controller_rate", &MOTOR_CONTROLLER_RATE, 1);
+    //WHEEL_DIAMETER = 0.15;
+  }
  
   // t_delta = 1.0 / base_controller_rate;
 
@@ -230,7 +232,7 @@ void MotorController::publishSpace(ros::Publisher &odom_pub)
   if (!doPublishSpace) return;
   doPublishSpace=false;
   
-  husky_base::RoverOdom odom_msg;
+  ultron_kernel::RobotOdom odom_msg;
 
   //odom_msg.header.stamp =  (*nh).now();
   //odom_msg.header.frame_id = "/petrorov/base/odom";
