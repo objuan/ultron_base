@@ -1,0 +1,7 @@
+analyzers:
+  ultron:
+    type: diagnostic_aggregator/GenericAnalyzer
+    path: Ultron 0001
+    find_and_remove_prefix: 'ultron_kernel: '
+    expected: ['ultron_kernel: power_status','ultron_kernel: system_status','ultron_kernel: safety_status','ultron_kernel: software_status']
+    timeout: 5.0
