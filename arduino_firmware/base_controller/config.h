@@ -124,8 +124,8 @@
 // BATTERY LEVEL
 // =========================
 
-#define BATTERY_PIN_ANAG_A A0
-#define BATTERY_PIN_ANAG_B A1
+#define BATTERY_PIN_ANAG_A A6
+#define BATTERY_PIN_ANAG_B A7
 
 
 // =========================

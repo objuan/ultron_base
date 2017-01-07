@@ -78,11 +78,14 @@ void MotorController:: init(ros::NodeHandle *nh)
   auto_stop_interval = POLLING_TIMEOUT * 1000 ;
 
   // dump
-  dtostrf(WHEEL_DIAMETER,4,3,tmp_msg1);
-  dtostrf(MAX_ACCELERATION,4,3,tmp_msg2);
-  dtostrf(MAX_SPEED,4,3,tmp_msg3);
-  sprintf(log_msg, "PARAMS: wheel_diameter:%s max_acceleration:%s max_speed:%s", tmp_msg1,tmp_msg2,tmp_msg3);
-  (*nh).loginfo(log_msg);
+  if (nh != NULL)
+  {
+    dtostrf(WHEEL_DIAMETER,4,3,tmp_msg1);
+    dtostrf(MAX_ACCELERATION,4,3,tmp_msg2);
+    dtostrf(MAX_SPEED,4,3,tmp_msg3);
+    sprintf(log_msg, "PARAMS: wheel_diameter:%s max_acceleration:%s max_speed:%s", tmp_msg1,tmp_msg2,tmp_msg3);
+    (*nh).loginfo(log_msg);
+  }
   
   // INIT
 

@@ -1,9 +1,27 @@
 
+CONFIGURAZIONE DI RETE
+
+in /etc/hosts mettere il DNS della macchina circolus
+
+export ROS_MASTER_URI=http://circolus:11311/
+export ROS_MASTER_URI=http://localhost:11311/
+export ROS_IP=`hostname -I`
+export ROS_HOSTNAME=`hostname -I`
+
+---------------------------------------------------------------------
+
+sudo -s // diritti di sudo
+
+---------------------------------------------------------------------
+
 aggiunto pacchetto 
+
+sudo apt-get install ros-kinetic-lms1xx
 
 -sudo apt-get install ros-kinetic-moveit
 -https://github.com/ros-teleop/twist_mux
-	source /opt/ros/kinetic/setup.bash
+
+ source /opt/ros/kinetic/setup.bash
 
 - https://github.com/ros-industrial/universal_robot.git
 tolte dipendenza da muve.it e kinneatic dal paccheto !!!
@@ -17,7 +35,7 @@ tolte dipendenza da muve.it e kinneatic dal paccheto !!!
 - https://github.com/ros-teleop/teleop_twist_joy.git
 
 
-// UTLITA
+// UTILITA
 
 vedere TF
 
