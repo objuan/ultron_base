@@ -9,8 +9,9 @@
 #include <sensor_msgs/BatteryState.h>
 #include <geometry_msgs/Twist.h>
 #include <ultron_kernel/GetRobotInfo.h>
-#include <ultron_kernel/RobotOdom.h>
 #include <ultron_kernel/RobotCommand.h>
+#include <ultron_kernel/RobotOdom.h>
+#include <ultron_kernel/GetDataEncoders.h>
 
 #include "config.h"
 #include "motor_controller.h"
@@ -165,6 +166,15 @@ void Stop_callback(const ultron_kernel::RobotCommand::Request & req, ultron_kern
 
 ros::ServiceServer<ultron_kernel::RobotCommand::Request, ultron_kernel::RobotCommand::Response> stop_srv(ROS_TOPIC_STOP_SRV,&Stop_callback);
 
+// ENCODER GET SERVICE
+
+void getDataEncoders_callback(const ultron_kernel::GetDataEncoders::Request & req, ultron_kernel::GetDataEncoders::Response & res){
+    
+  motorController.getDataEncoders(res);
+  nh.loginfo("getDataEncoders_callback");
+}
+
+ros::ServiceServer<ultron_kernel::GetDataEncoders::Request, ultron_kernel::GetDataEncoders::Response> getDataEncoders_srv(ROS_TOPIC_GET_DATA_ENCODERS_SRV,&getDataEncoders_callback);
 
 // ----------------
 //  Service Client
@@ -182,16 +192,18 @@ void setup() {
 
 #ifdef DEBUG_MODE
   Serial.begin(BAUDRATE);
+  while (!Serial); // wait for Leonardo enumeration, others continue immediately
   Serial.println("Init Message Test");
   Serial.println("DEBUG MODE");
- #endif
 
-#ifdef DEBUG_MODE
   //motorController.init(NULL);
- 
+
+  sensorManager.setup(NULL);
   sensorManager.init(NULL);
   return;
  #endif
+
+  sensorManager.pre_setup_mpu();
   
   /// ROS
 
@@ -223,8 +235,17 @@ void setup() {
   nh.advertiseService(state_srv);
   nh.advertiseService(reset_position_srv);
   nh.advertiseService(stop_srv);
+  nh.advertiseService(getDataEncoders_srv);
+
 
   nh.serviceClient(connect_client);
+
+  // Wait for ROSserial to connect
+  /*while (!nh.connected()) 
+  {
+    nh.spinOnce();
+  }
+  */
 
   //SENSORS
 
@@ -277,11 +298,11 @@ void loop_debug(){
   
 #endif
 
-#ifdef DEBUG_RANGE
+#if (DEBUG_RANGE) || (DEBUG_IMU)
   sensorManager.dump();
    delay(100);
-
 #endif
+
 
 }
 
@@ -362,21 +383,26 @@ void loop() {
 
 */
 
+  long now = millis();
+    
   //MOTOR
 
-  motorController.tick();
+  motorController.tick(now);
   
   // PUB STATE
 
   motorController.publishSpace(motor_state_pub);
 
+ // nh.spinOnce();
+  
   // SENSORS
 
-  sensorManager.tick();
+  sensorManager.tick(now);
+
+ // nh.spinOnce();
   
   // DIAGNOSTIC
 
-   long now = millis();
    if ((now - lastDiagnosticTime) > diagnostic_rate_ms) {
       lastDiagnosticTime = now;
       float bat1 = battery_1.readValue();
@@ -399,7 +425,9 @@ void loop() {
   
   nh.spinOnce();
 
- 
+  sensorManager.post_tick(now);
 
+  nh.spinOnce();
+  delay(1);
  // delay(500);
 }

@@ -140,9 +140,8 @@ void MotorController::setVelocity(float leftSpeed, float rightSpeed) {
 }
 
 
-void MotorController::tick()
+void MotorController::tick(long now)
 {
-    long now = millis();
     if ((now - lastMotorCommand) > auto_stop_interval) {;
       setMotorSpeeds(0, 0);
       moving = 0;
@@ -268,6 +267,12 @@ void MotorController::publishSpace(ros::Publisher &odom_pub)
   
   odom_msg.lastPidTime= t_pid;
   odom_pub.publish(&odom_msg);
+}
+
+void MotorController::getDataEncoders( ultron_kernel::GetDataEncoders::Response &res){
+  res.left_encoder_pos = (readEncoder(MOTOR_LEFT))  ;
+  res.right_encoder_pos = (readEncoder(MOTOR_RIGHT));
+  
 }
 
 

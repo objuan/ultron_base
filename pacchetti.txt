@@ -1,0 +1,24 @@
+
+
+
+aggiuti  pacchetto 
+
+sudo apt-get install ros-kinetic-lms1xx
+
+-sudo apt-get install ros-kinetic-moveit
+-https://github.com/ros-teleop/twist_mux
+
+ source /opt/ros/kinetic/setup.bash
+
+- https://github.com/ros-industrial/universal_robot.git
+tolte dipendenza da muve.it e kinneatic dal paccheto !!!
+
+- https://github.com/cra-ros-pkg/robot_localization.git
+
+- https://github.com/ros-geographic-info/geographic_info.git
+
+- https://github.com/ros-visualization/interactive_marker_twist_server.git
+
+- https://github.com/ros-teleop/teleop_twist_joy.git
+
+

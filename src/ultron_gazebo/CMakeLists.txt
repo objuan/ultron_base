@@ -4,8 +4,6 @@ project(ultron_gazebo)
 find_package(catkin REQUIRED COMPONENTS roslaunch)
 
 catkin_package()
-catkin_add_env_hooks(50.ultron_gazebo
-  SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
 
 roslaunch_add_file_check(launch)
 

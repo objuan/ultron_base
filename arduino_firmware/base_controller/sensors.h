@@ -24,8 +24,10 @@ private:
     int ultrasonicCount;
     char *ultrasonicNames[10];
 
-    long lastTime;
-    long polling_rate_ms;
+    long last_time_range;
+    long last_time_imu;
+    long range_rate_ms;
+    long imu_rate_ms;
     
   public:  
 
@@ -33,12 +35,18 @@ private:
     }
     ~SensorManager();
 
+    void pre_setup_mpu();
+    void setup_mpu();
+    void init_mpu();
+    void load_mpu();
+  
     void setup(ros::NodeHandle *nh);
     void init(ros::NodeHandle *nh);
 
     void dump();
 
-    void tick();
+    void tick(long now);
+    void post_tick(long now);
     
 };
 

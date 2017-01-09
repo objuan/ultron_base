@@ -2,7 +2,7 @@
 
 <launch>
 
-  <arg name="model" default="$(find ultron_description)/urdf/test.xacro"/>
+  <arg name="model" default="$(find ultron_description)/urdf/ultron.urdf.xacro"/>
   <arg name="gui" default="true" />
   <arg name="rvizconfig" default="$(find ultron_description)/rviz/urdf.rviz" />
 

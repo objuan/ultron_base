@@ -1,0 +1,117 @@
+
+CONFIGURAZIONE DI RETE
+
+in /etc/hosts mettere il DNS della macchina circolus
+
+export ROS_MASTER_URI=http://circolus:11311/
+export ROS_MASTER_URI=http://localhost:11311/
+export ROS_IP=`hostname -I`
+export ROS_HOSTNAME=`hostname -I`
+
+---------------------------------------------------------------------
+USB+ SUDO
+---------------------------------------------------------------------
+
+- can't open device "/dev/ttyUSB0": Permission denied
+sudo chmod 666 /dev/ttyUSB0
+
+sudo -s // diritti di sudo permanenti
+
+---------------------------------------------------------------------
+// UTILITA
+---------------------------------------------------------------------
+
+vedere TF
+
+ - rosrun tf view_frames 
+ fa un  PDF
+
+// ========================= PRIMA DI PARTIRE =============
+
+setup del file di modello, fatto in automatico con source devel/setup.sh
+
+sh /home/marco/petrorov/ultron_ws/src/ultron/ultron_description/env-hooks/50.ultron_description.sh
+
+// ==================================
+// ULTRON KERNEL
+// ==================================
+
+lancio solo arduino
+
+$ roslaunch ultron_kernel arduino.launch port:=/dev/ttyUSB0
+
+lancio ROBOT con arduino
+
+$ roslaunch ultron_kernel base.launch 
+
+lancio ROBOT senza arduino
+
+$ roslaunch ultron_kernel base_nohw.launch 
+
+//VISUALIZZAZIONE MODELLO
+
+roslaunch ultron_description display.launch 
+
+
+//
+KINECT
+
+$ rosrun image_view image_view image:=/camera/rgb/image_color
+$ rosrun image_view image_view image:=/camera/depth/image
+
+$ roslaunch freenect_launch freenect.launch // camera kinect
+$ rosrun libfreenect glview //  libfreenect test
+
+kinet to laser scanner
+
+$ rosrun depthimage_to_laserscan depthimage_to_laserscan image/camera/depth/image_raw
+Fixed Frame -> camera_depth_frame
+
+// ==================================
+// Move Base Demo
+// ==================================
+
+
+Start the Clearpath-configured Husky simulation environment:
+
+$ roslaunch husky_gazebo husky_playpen.launch
+
+Start the Clearpath-configured rviz visualizer:
+
+$ roslaunch ultron_viz view_robot.launch
+
+Start the move_base demo:
+
+$ roslaunch ultron_navigation move_base_mapless_demo.launch
+
+
+// ==================================
+// DA VEDERE
+// ==================================
+
+Now plug in a joystick, and in another terminal, run:
+
+$ roslaunch ultron_teleop teleop.launch
+
+Hold button 1 (the deadman switch) and you should be driving. 
+
+// ================================================
+
+roscore
+rosparam set enable_odom_tf true
+rosparam set use_sim_time true
+roslaunch ultron_viz view_robot.launch
+roslaunch ultron_navigation gmapping_demo.launch 
+rosbag play --clock file.bag
+
+// ============
+
+// ================================================
+
+Simulating Ultron
+
+export ULTRON_GAZEBO_DESCRIPTION=$(rospack find ultron_gazebo)/urdf/description.gazebo.xacro
+
+roslaunch ultron_gazebo ultron_empty_world.launch world_name:=worlds/willowgarage.world
+
+roslaunch ultron_gazebo ultron_empty_world.launch

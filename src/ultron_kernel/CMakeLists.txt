@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ultron_kernel)
 
 find_package(catkin REQUIRED COMPONENTS controller_manager hardware_interface 
-  diagnostic_updater roslaunch roslint roscpp sensor_msgs std_msgs message_generation)
+  diagnostic_updater roslaunch roslint roscpp sensor_msgs std_msgs message_generation tf)
 find_package(Boost REQUIRED COMPONENTS chrono)
 
+catkin_python_setup()
 
 # aggiunti
 
@@ -13,12 +14,14 @@ add_message_files(
   RobotInfo.msg
   RobotStatus.msg
   RobotOdom.msg
+  RobotIMU.msg
 )
 
 add_service_files(
   FILES
   GetRobotInfo.srv
   RobotCommand.srv
+  GetDataEncoders.srv
 )
 # aggiunti
 
@@ -52,7 +55,21 @@ roslint_cpp(
   include/ultron_kernel/ultron_hardware.h
 )
 
+add_executable(mpu6050_serial_to_imu_node 
+  src/mpu6050_serial_to_imu_node.cpp)
+
+## Specify libraries to link a library or executable target against
+target_link_libraries(mpu6050_serial_to_imu_node
+  ${catkin_LIBRARIES}
+)
+
 roslaunch_add_file_check(launch)
+
+
+
+install(PROGRAMS scripts/serial_node.py scripts/MySerialClient.py 
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 install(TARGETS ultron_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

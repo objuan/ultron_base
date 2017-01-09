@@ -26,6 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
+   <env name="ROS_LOG_DIR" value="$(find ultron_kernel)/log"/>
+
     <arg name="port" default="$(optenv ultron_PORT /dev/ttyUSB0)" />
 
     <!-- Load robot description -->
@@ -33,10 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
      <!-- Petrorov arduino driver -->
      <!-- rate are in HZ -->
-    <node pkg="rosserial_python" type="serial_node.py" name="petrorov_node">
+     <!-- baud: 115200,57600 -->
+    <node pkg="ultron_kernel" type="myserial_node.py" name="petrorov_node">
+   <!-- <node pkg="rosserial_python" type="serial_node.py" name="petrorov_node">-->
         <rosparam subst_value="true">
             port: $(arg port)
-            baud: 115200
+            baud: 57600
 
             max_acceleration: 3.0
             max_speed: 1.0
@@ -44,8 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             polling_timeout: 2.0
             
-            diagnostic_rate: 1.0
-            range_sensor_rate: 8.0
+            diagnostic_rate: 10.0
+            range_sensor_rate: 60.0
+            imu_sensor_rate: 200.0
         </rosparam>
     </node>
 

@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include <ros.h>
+#include <ultron_kernel/GetDataEncoders.h>
 
 #if (ARDUINO >= 100)
  #include <Arduino.h>
@@ -70,7 +71,7 @@ private:
     void setVelocity(float leftSpeedMS, float rightSpeedMS);
 
   
-    void tick();
+    void tick(long now);
     
     // action 
 
@@ -79,6 +80,11 @@ private:
     // publish
     
     void publishSpace(ros::Publisher &odom_pub);
+    
+    // service
+
+    void getDataEncoders( ultron_kernel::GetDataEncoders::Response &res);
+    
 };
 
 #endif

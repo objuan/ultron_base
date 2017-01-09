@@ -8,8 +8,9 @@
 //#define DEBUG_BATTERY 1
 //#define DEBUG_ENC 1
 //#define DEBUG_RANGE 1
+//#define DEBUG_IMU 1
 
-#if (DEBUG_MOTOR) || (DEBUG_BATTERY) || (DEBUG_ENC) || (DEBUG_RANGE)
+#if (DEBUG_MOTOR) || (DEBUG_BATTERY) || (DEBUG_ENC) || (DEBUG_RANGE) || (DEBUG_IMU)
   #define DEBUG_MODE 1
 #endif
 
@@ -20,7 +21,7 @@
 // =======================
 
 /* Serial port baud rate */
-#define BAUDRATE     115200 // 57600
+#define BAUDRATE     57600 // 57600 115200
 
 /* Run the PID loop at 30 times per second */
 #define PID_RATE       30     // Hz
@@ -48,10 +49,12 @@
 #define ROS_TOPIC_SENSOR "/petrorov/base/sensor_value"
 #define ROS_TOPIC_MOTOR_STATE "/petrorov/base/motor_state"
 #define ROS_TOPIC_RANGE_SENSOR "/petrorov/base/range"
+#define ROS_TOPIC_IMU "/petrorov/base/imu"
 
 #define ROS_TOPIC_GET_INFO_SRV "/petrorov/base/srv/getInfo"
 #define ROS_TOPIC_RESET_POS_SRV "/petrorov/base/srv/resetPos"
 #define ROS_TOPIC_STOP_SRV "/petrorov/base/srv/stop"
+#define ROS_TOPIC_GET_DATA_ENCODERS_SRV "/petrorov/base/srv/getDataEncoders"
 
 // =========================
 //    CMD
@@ -137,6 +140,16 @@
 #define RANGE_SENSOR_LIST      "24,22,/ultrasound_front"
 
 // =======================
+
+// =========================
+// IMU , MEGA CONFIG
+// =========================
+
+#define IMU_INT_PIN   19  // 19
+#define IMU_LED_PIN   13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+#define IMU_SDA_PIN   20
+#define IMU_SCL_PIN   21
+
 
 
 extern char log_msg[1000];

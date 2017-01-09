@@ -17,6 +17,7 @@
 #include <ultron_kernel/RobotInfo.h>
 #include <ultron_kernel/RobotOdom.h>
 #include <ultron_kernel/RobotCommand.h>
+#include <ultron_kernel/GetDataEncoders.h>
 
 namespace ultron_kernel
 {
@@ -62,6 +63,7 @@ namespace ultron_kernel
     void GetRobotInfoSrv();
     void ResetPositionSrv();
     void StopSrv();
+    void GetDataEncodersSrv();
 
   private:
 

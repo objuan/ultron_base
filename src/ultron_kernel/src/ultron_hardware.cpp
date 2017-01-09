@@ -19,13 +19,13 @@ namespace ultron_kernel
   UltronHardware::UltronHardware(ros::NodeHandle nh, ros::NodeHandle private_nh, double target_control_freq)
     :
     nh_(nh),
-    private_nh_(private_nh),
+    private_nh_(private_nh),isConnected(false),
    // system_status_task_(ultron_status_msg_),
    // power_status_task_(ultron_status_msg_),
   //  safety_status_task_(ultron_status_msg_),
     software_status_task_(ultron_status_msg_, target_control_freq)
   {
-    private_nh_.param<double>("wheel_diameter", wheel_diameter_, 0.3555);
+    private_nh_.param<double>("wheel_diameter", wheel_diameter_, 0.15);
    // private_nh_.param<double>("max_accel", max_accel_, 5.0);
   //  private_nh_.param<double>("max_speed", max_speed_, 1.0);
   //  private_nh_.param<double>("polling_timeout_", polling_timeout_, 10.0);
@@ -38,7 +38,6 @@ namespace ultron_kernel
 
     // ARDUINO INTERFACE
 
-    isConnected=false;
 
     cmd_vel_pub_ = nh_.advertise<ultron_kernel::RobotOdom>("/petrorov/cmd_vel", 1);
 
@@ -92,7 +91,7 @@ namespace ultron_kernel
             ROS_INFO("ROBOT NAME: %s",srv.response.info.name.c_str());
             robotName = srv.response.info.name.c_str();
 
-            // messo qui , il service onRobotConnectedSrv no nva
+            // messo qui , il service onRobotConnectedSrv non va
             isConnected=true;
 
             // aspetto un attimo
@@ -100,6 +99,8 @@ namespace ultron_kernel
             ros::Duration(0.5).sleep(); // sleep for half a second
 
             ResetPositionSrv();
+
+            GetDataEncodersSrv();
 
             StopSrv();
         }
@@ -112,6 +113,7 @@ namespace ultron_kernel
 
   void UltronHardware::ResetPositionSrv()
   {
+	if (!isConnected) return;
         ros::ServiceClient client = private_nh_.serviceClient<ultron_kernel::RobotCommand>("/petrorov/base/srv/resetPos");
         ultron_kernel::RobotCommand srv;
 
@@ -126,8 +128,32 @@ namespace ultron_kernel
         }
   }
 
+  void UltronHardware::GetDataEncodersSrv()
+  {
+	if (!isConnected) return;
+	ROS_INFO("GetDataEncodersSrv CALL");
+
+        ros::ServiceClient client = private_nh_.serviceClient<ultron_kernel::GetDataEncoders>("/petrorov/base/srv/getDataEncoders");
+        ultron_kernel::GetDataEncoders srv;
+
+        if (client.call(srv))
+        {
+            ROS_INFO("GetDataEncodersSrv DONE");
+
+ 	    for (int i = 0; i < 4; i++)
+	    {
+	        joints_[i%2].position_offset = linearToAngular((i % 2 == 0) ? srv.response.left_encoder_pos : srv.response.right_encoder_pos);
+	    }
+        }
+        else
+        {
+            ROS_ERROR("Failed to connect GetDataEncodersSrv .. ");
+        }
+  }
+
   void UltronHardware::StopSrv()
   {
+	if (!isConnected) return;
         ros::ServiceClient client = private_nh_.serviceClient<ultron_kernel::RobotCommand>("/petrorov/base/srv/stop");
         ultron_kernel::RobotCommand srv;
 
@@ -146,6 +172,8 @@ namespace ultron_kernel
   */
   void UltronHardware::resetTravelOffset()
   {
+	GetDataEncodersSrv();
+	//TODO
    /* horizon_legacy::Channel<clearpath::DataEncoders>::Ptr enc = horizon_legacy::Channel<clearpath::DataEncoders>::requestData(
       polling_timeout_);
     if (enc)

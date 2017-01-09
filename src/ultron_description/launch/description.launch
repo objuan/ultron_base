@@ -2,16 +2,17 @@
 
 <launch>
 
+   <arg name="robot_namespace" default="/"/>
   <arg name="laser_enabled" default="$(optenv ULTRON_LMS1XX_ENABLED false)"/>
-  <arg name="ur5_enabled" default="$(optenv ULTRON_UR5_ENABLED false)"/>
-  <arg name="kinect_enabled" default="false"/>
+  <arg name="kinect_enabled" default="$(optenv ULTRON_KINECT_ENABLED false)"/>
+  <arg name="urdf_extras" default="$(optenv ULTRON_URDF_EXTRAS)"/>
 
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(env ULTRON_DESCRIPTION)'
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find ultron_description)/urdf/ultron.urdf.xacro'
+    --inorder
+    robot_namespace:=$(arg robot_namespace)
     laser_enabled:=$(arg laser_enabled)
-    ur5_enabled:=$(arg ur5_enabled)
     kinect_enabled:=$(arg kinect_enabled)
+    urdf_extras:=$(arg urdf_extras)
     " />
-
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
 </launch>
