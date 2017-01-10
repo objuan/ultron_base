@@ -26,38 +26,25 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
-    <env name="ROS_LOG_DIR" value="$(find ultron_kernel)/log"/>
-    
-    <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB0)" />
-    <arg name="port_base" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB1)" />
+    <arg name="port" default="$(optenv ultron_PORT /dev/ttyUSB0)" />
 
     <!-- Load robot description -->
-    <include file="$(find ultron_description)/launch/description.launch"/>
+    <!--<include file="$(find ultron_description)/launch/description.launch"/>-->
 
-     <!-- Petrorov arduino driver -->
-    <include file="$(find ultron_kernel)/launch/arduino.launch"/>
-
-    <!-- Petrorov hardware driver -->
-    <node pkg="ultron_kernel" type="ultron_node" name="ultron_node">
+    <!-- Petrorov harware driver -->
+    <node pkg="rosserial_python" type="serial_node.py" name="petrorov_node">
         <rosparam subst_value="true">
-            
+            port: $(arg port)
+            baud: 115200
+
             control_frequency: 10.0
             diagnostic_frequency: 1.0
 
+            max_acceleration: 3.0
+            max_speed: 1.0
             wheel_diameter: 0.15
-
+            polling_timeout: 10.0
         </rosparam>
-    </node>
-
-    <!-- Differential controller parameters and basic localization -->
-    <include file="$(find ultron_control)/launch/control.launch" />
-
-    <!--Teleop -->
-    <include file="$(find ultron_control)/launch/teleop.launch" />
-
-    <!-- Diagnostic Aggregator -->
-    <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
-        <rosparam command="load" file="$(find ultron_kernel)/config/diagnostics.yaml"/>
     </node>
 
 </launch>

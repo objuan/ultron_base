@@ -1,6 +1,5 @@
 
 
-
 aggiuti  pacchetto 
 
 sudo apt-get install ros-kinetic-lms1xx
@@ -20,5 +19,9 @@ tolte dipendenza da muve.it e kinneatic dal paccheto !!!
 - https://github.com/ros-visualization/interactive_marker_twist_server.git
 
 - https://github.com/ros-teleop/teleop_twist_joy.git
+
+SERIAL
+
+https://github.com/wjwwood/serial
 
 

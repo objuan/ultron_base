@@ -1,0 +1,5 @@
+<launch>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ultron_kernel)/rviz/demo.rviz" required="true"/>
+
+</launch>

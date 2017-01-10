@@ -26,25 +26,42 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
-    <arg name="port" default="$(optenv ultron_PORT /dev/ttyUSB0)" />
+     <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB1)" />
+     <arg name="port_base" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB0)" />
 
-    <!-- Load robot description -->
-    <!--<include file="$(find ultron_description)/launch/description.launch"/>-->
+      <!-- Petrorov arduino driver -->
 
-    <!-- Petrorov harware driver -->
+     <node pkg="ultron_kernel" type="mpu6050_serial_to_imu_node" name="mpu6050_serial_to_imu_node" required="true">
+        <param name="port" value="$(arg port_imu)"/>
+        <param name="tf_parent_frame_id" value="base_link"/>
+        <param name="tf_frame_id" value="imu_link"/>
+        <param name="frame_id" value="imu_link"/>
+        <param name="time_offset_in_seconds" value="0"/>
+	<param name="broadcast_tf" value="true"/>
+	<param name="linear_acceleration_stddev" value="0"/>
+	<param name="angular_velocity_stddev" value="0"/>
+	<param name="orientation_stddev" value="0"/>
+    </node>
+
+     <!-- rate are in HZ -->
+     <!-- baud: 115200,57600 -->
+   <!-- <node pkg="ultron_kernel" type="myserial_node.py" name="petrorov_node">-->
     <node pkg="rosserial_python" type="serial_node.py" name="petrorov_node">
         <rosparam subst_value="true">
-            port: $(arg port)
+            port: $(arg port_base)
             baud: 115200
-
-            control_frequency: 10.0
-            diagnostic_frequency: 1.0
 
             max_acceleration: 3.0
             max_speed: 1.0
             wheel_diameter: 0.15
-            polling_timeout: 10.0
+
+            polling_timeout: 2.0
+            
+            motor_rate : 30.0
+            diagnostic_rate: 1.0
+            range_sensor_rate: 10.0
         </rosparam>
     </node>
+
 
 </launch>

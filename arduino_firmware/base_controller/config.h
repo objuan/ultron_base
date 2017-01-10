@@ -21,13 +21,13 @@
 // =======================
 
 /* Serial port baud rate */
-#define BAUDRATE     57600 // 57600 115200
+#define BAUDRATE     115200 // 57600 115200
 
 /* Run the PID loop at 30 times per second */
-#define PID_RATE       30     // Hz
+//#define PID_RATE       30     // Hz
 
 /* Convert the rate into an interval */
-#define PID_INTERVAL_FLOAT  (1000.0 / PID_RATE)
+//#define PID_INTERVAL_FLOAT  (1000.0 / PID_RATE)
 
 
 // ============ MOTOR ======
@@ -145,6 +145,7 @@
 // IMU , MEGA CONFIG
 // =========================
 
+//#define IMU_ENABLE    1
 #define IMU_INT_PIN   19  // 19
 #define IMU_LED_PIN   13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 #define IMU_SDA_PIN   20

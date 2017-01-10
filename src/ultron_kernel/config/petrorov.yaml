@@ -1,0 +1,5 @@
+robot:
+  petrorov:
+    port_imu: /dev/ttyUSB0
+    port_base: /dev/ttyUSB1
+    

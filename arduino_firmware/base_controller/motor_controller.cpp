@@ -17,7 +17,7 @@
 //#define MS_TO_REV (1.0 / (WHEEL_DIAMETER * PI))
 
 /* Convert the rate into an interval */
-const int PID_INTERVAL_MS = 1000 / PID_RATE;
+//const int PID_INTERVAL_MS = 1000 / PID_RATE;
   
 /* Track the next time we make a PID calculation */
 //unsigned long nextPID = PID_INTERVAL_MS;
@@ -31,6 +31,7 @@ const int PID_INTERVAL_MS = 1000 / PID_RATE;
 // FROM MAIN CODE
 
 void setMotorSpeeds(int leftSpeed, int rightSpeed);
+float PID_INTERVAL_FLOAT;
 
 // ====================
 
@@ -52,6 +53,7 @@ void MotorController:: init(ros::NodeHandle *nh)
   MAX_ACCELERATION = 3;
   MAX_SPEED = 1;
   POLLING_TIMEOUT = 2;
+  MOTOR_RATE = 10;
   //MOTOR_CONTROLLER_RATE = 10;
 
   if (nh != NULL)
@@ -60,6 +62,7 @@ void MotorController:: init(ros::NodeHandle *nh)
     nh->getParam("~max_acceleration", &MAX_ACCELERATION, 1);
     nh->getParam("~max_speed", &MAX_SPEED, 1);
     nh->getParam("~polling_timeout", &POLLING_TIMEOUT, 1);
+    nh->getParam("~motor_rate", &MOTOR_RATE, 1);
    // nh->getParam("~motor_controller_rate", &MOTOR_CONTROLLER_RATE, 1);
     //WHEEL_DIAMETER = 0.15;
   }
@@ -67,19 +70,26 @@ void MotorController:: init(ros::NodeHandle *nh)
   // t_delta = 1.0 / base_controller_rate;
 
   //MS_TO_REV  = (1.0 / (WHEEL_DIAMETER * PI));
+  motor_rate_ms = 1000 / MOTOR_RATE;
+  PID_INTERVAL_FLOAT = 1000 / MOTOR_RATE;
   
    // How many encoder ticks are there per meter?
   ticks_per_meter = ENCODER_RESOLUTION * GEAR_REDUCTION / (WHEEL_DIAMETER * PI);
-  ticks_per_meter_div_RATE = ticks_per_meter / PID_RATE;
+  ticks_per_meter_div_RATE = ticks_per_meter / MOTOR_RATE;
   ticks_per_meter_div_RATE_inv = 1.0f / ticks_per_meter_div_RATE;
   
   // What is the maximum acceleration we will tolerate when changing wheel speeds?
-  max_acceleration_ticks = MAX_ACCELERATION * ticks_per_meter / PID_RATE;
+  max_acceleration_ticks = MAX_ACCELERATION * ticks_per_meter / MOTOR_RATE;
   auto_stop_interval = POLLING_TIMEOUT * 1000 ;
 
   // dump
   if (nh != NULL)
   {
+    dtostrf(MOTOR_RATE,4,3,tmp_msg1);
+    dtostrf(POLLING_TIMEOUT,4,3,tmp_msg2);
+    sprintf(log_msg, "PARAMS: motor_rate:%s polling_timeout:%s ", tmp_msg1,tmp_msg2);
+    (*nh).loginfo(log_msg);
+    
     dtostrf(WHEEL_DIAMETER,4,3,tmp_msg1);
     dtostrf(MAX_ACCELERATION,4,3,tmp_msg2);
     dtostrf(MAX_SPEED,4,3,tmp_msg3);
@@ -151,7 +161,7 @@ void MotorController::tick(long now)
 
     long t_delta = now - t_last;
     
-    if (t_delta > PID_INTERVAL_MS) 
+    if (t_delta > motor_rate_ms) 
     {
       // aggiorno il PID
       t_pid = t_delta;

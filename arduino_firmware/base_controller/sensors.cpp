@@ -1,5 +1,13 @@
 #include "sensors.h"
 
+#include <sensor_msgs/Range.h>
+sensor_msgs::Range range_msg;
+ros::Publisher pub_range( ROS_TOPIC_RANGE_SENSOR, &range_msg);
+
+// ===================================
+
+#ifdef IMU_ENABLE
+
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
@@ -18,11 +26,8 @@
 
 // ================ ROS ===================
 
-#include <sensor_msgs/Range.h>
-#include <ultron_kernel/RobotIMU.h>
 
-sensor_msgs::Range range_msg;
-ros::Publisher pub_range( ROS_TOPIC_RANGE_SENSOR, &range_msg);
+#include <ultron_kernel/RobotIMU.h>
 
 ultron_kernel::RobotIMU imu_msg;
 ros::Publisher pub_imu( ROS_TOPIC_IMU, &imu_msg);
@@ -77,7 +82,7 @@ void SensorManager::pre_setup_mpu() {
        // Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_INT, I2C_RATE_400);
         Wire.begin();
         //Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-        TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
+        TWBR = 12; //24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
     #endif
@@ -218,7 +223,8 @@ void SensorManager::load_mpu() {
         // .
         // .
        // nh.spinOnce();
-       // delay(1);
+        delay(1);
+       return;
     }
     
 
@@ -239,18 +245,25 @@ void SensorManager::load_mpu() {
     // check for overflow (this should never happen unless our code is too inefficient)
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
-        mpu.resetFIFO();
+       
          #ifdef DEBUG_IMU
         Serial.println(F("FIFO overflow!"));
         #else
        // (*nh).loginfo("MPU FIFO overflow!");
         #endif
+         mpu.resetFIFO();
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
     
         // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+        while (fifoCount < packetSize)
+        {
+          // FIX A LIBRARY BUG
+          //fifoCount = mpu.getFIFOCount();
+          delay(10);
+          return;
+        }
 
       // (*nh).loginfo("DONE!");
   
@@ -427,6 +440,19 @@ void SensorManager::load_mpu() {
     }
 }
 
+#else
+  // NO IMU
+
+  void SensorManager::pre_setup_mpu() {
+  }
+  void SensorManager::setup_mpu() {
+  }
+  void SensorManager::load_mpu() {
+  }
+  void SensorManager::init_mpu() {
+  }
+#endif
+
 // =========== SONAR =================
 
 // HC-SR04
@@ -451,7 +477,9 @@ void SensorManager::setup(ros::NodeHandle *nh){
     if (nh!=NULL)
     {
        nh->advertise(pub_range);
+       #ifdef IMU_ENABLE
        nh->advertise(pub_imu);
+       #endif
     }
 
      setup_mpu();
@@ -468,7 +496,9 @@ void SensorManager:: init(ros::NodeHandle *nh)
   if (nh != NULL)
   {
     nh->getParam("~range_sensor_rate", &RANGE_SENSOR_RATE, 1);
+    #ifdef IMU_ENABLE
     nh->getParam("~imu_sensor_rate", &IMU_SENSOR_RATE, 1);
+    #endif
 
      range_msg.radiation_type = sensor_msgs::Range::ULTRASOUND;
 
@@ -589,25 +619,27 @@ void SensorManager::tick(long now)
        }
    }
 
-    
+ #ifdef IMU_ENABLE
    if (sendIMU)
    {
       sendIMU=false;
 
       pub_imu.publish(&imu_msg);
    }
-  
+ #endif 
 
 }
 
 void SensorManager::post_tick(long now)
 {
+  #ifdef IMU_ENABLE
    if ((now - last_time_imu) > imu_rate_ms) {
       last_time_imu = now;
       load_mpu();
       sendIMU=true;
 
   }
+  #endif
 
 }
    

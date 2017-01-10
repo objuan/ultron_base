@@ -20,7 +20,8 @@ class MotorController
     float MAX_SPEED;
     float MAX_ACCELERATION;
     // seconds
-    int POLLING_TIMEOUT;
+    float MOTOR_RATE;
+    float POLLING_TIMEOUT;
     
     //float MOTOR_CONTROLLER_RATE;
     //float MS_TO_REV;
@@ -29,7 +30,8 @@ private:
     
     long lastMotorCommand;
     float ticks_per_meter;
-    
+
+    long motor_rate_ms;
     float ticks_per_meter_div_RATE;
     float ticks_per_meter_div_RATE_inv;
     

@@ -8,6 +8,7 @@
 
 // FROM EXTERNAL
 void setMotorSpeeds(int leftSpeed, int rightSpeed);
+extern float PID_INTERVAL_FLOAT;
 
 // 
 
