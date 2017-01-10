@@ -383,11 +383,9 @@ void loop() {
 
 */
 
-  long now = millis();
-    
   //MOTOR
 
-  motorController.tick(now);
+  motorController.tick();
   
   // PUB STATE
 
@@ -397,11 +395,12 @@ void loop() {
   
   // SENSORS
 
-  sensorManager.tick(now);
+  sensorManager.tick();
 
  // nh.spinOnce();
   
   // DIAGNOSTIC
+  long now = millis();
 
    if ((now - lastDiagnosticTime) > diagnostic_rate_ms) {
       lastDiagnosticTime = now;
@@ -414,7 +413,7 @@ void loop() {
       sensor_msgs::BatteryState &batteryState_msg2 = battery_2.getMessage();
       battery_pub2.publish(&batteryState_msg2);
     }
-    
+  
   // ------------------
 
   /*
@@ -423,11 +422,11 @@ void loop() {
   sensor_pub.publish(&adc_msg);
   */
   
-  nh.spinOnce();
+  // nh.spinOnce();
 
-  sensorManager.post_tick(now);
-
+  sensorManager.post_tick();
+  
   nh.spinOnce();
-  delay(1);
+ // delay(1);
  // delay(500);
 }

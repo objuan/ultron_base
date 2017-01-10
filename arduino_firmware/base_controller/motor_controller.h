@@ -73,7 +73,7 @@ private:
     void setVelocity(float leftSpeedMS, float rightSpeedMS);
 
   
-    void tick(long now);
+    void tick();
     
     // action 
 

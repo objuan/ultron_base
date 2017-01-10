@@ -126,7 +126,7 @@ void setup() {
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
       //  Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-       TWBR =12;
+       TWBR =12; // 24
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
     #endif
@@ -234,7 +234,7 @@ void loop() {
     // get current FIFO count
     fifoCount = mpu.getFIFOCount();
 
-  //Serial.println(fifoCount);
+  // Serial.println(fifoCount);
 
     // check for overflow (this should never happen unless our code is too inefficient)
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {

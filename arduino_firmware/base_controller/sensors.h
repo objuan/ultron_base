@@ -45,8 +45,8 @@ private:
 
     void dump();
 
-    void tick(long now);
-    void post_tick(long now);
+    void tick();
+    void post_tick();
     
 };
 

@@ -75,7 +75,7 @@ void resetPID(){
 
 /* PID routine to compute the next motor commands */
 
-void doPID(SetPointInfo * p,float frameFimeFactor){
+void doPID(SetPointInfo * p,float frameTimeFactor){
   long Perror;
   long output;
 
@@ -85,7 +85,7 @@ void doPID(SetPointInfo * p,float frameFimeFactor){
   Perror = p->TargetTicksPerFrame - ( p->Delta);
           
   // Derivative error is the delta Perror
-  output = frameFimeFactor * (Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko;
+  output = (frameTimeFactor) * ((Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko);
   
   p->PrevErr = Perror;
   p->PrevEnc = p->Encoder;
@@ -145,7 +145,7 @@ void doPID_bo(SetPointInfo * p) {
 }
 
 /* Read the encoder values and call the PID routine */
-void updatePID(float deltaTimeMS) {
+void updatePID(float deltaTimeMS,ros::NodeHandle *nh) {
   /* Read the encoders */
   leftPID.Encoder = readEncoder(MOTOR_LEFT);
   rightPID.Encoder = readEncoder(MOTOR_RIGHT);
@@ -169,11 +169,16 @@ void updatePID(float deltaTimeMS) {
     return;
   }
 
-  float frameFimeFactor= deltaTimeMS / PID_INTERVAL_FLOAT;
+  float frameTimeFactor= deltaTimeMS / PID_INTERVAL_FLOAT;
+
+  //dtostrf(frameTimeFactor,4,3,tmp_msg1);
+  ///sprintf(log_msg, "DIFF: frameTimeFactor:%s ", tmp_msg1);
+  //(*nh).loginfo(log_msg);
+  
   
   /* Compute PID update for each motor */
-  doPID(&rightPID,frameFimeFactor);
-  doPID(&leftPID,frameFimeFactor);
+  doPID(&rightPID,frameTimeFactor);
+  doPID(&leftPID,frameTimeFactor);
 
   /* Set the motor speeds accordingly */
   setMotorSpeeds(leftPID.output, rightPID.output);

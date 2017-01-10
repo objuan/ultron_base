@@ -603,9 +603,9 @@ void SensorManager::dump(){
 
 bool sendIMU = false;
 
-void SensorManager::tick(long now)
+void SensorManager::tick()
 {
-
+  long now = millis();
    if ((now - last_time_range) > range_rate_ms) {
       last_time_range = now;
 
@@ -630,7 +630,7 @@ void SensorManager::tick(long now)
 
 }
 
-void SensorManager::post_tick(long now)
+void SensorManager::post_tick()
 {
   #ifdef IMU_ENABLE
    if ((now - last_time_imu) > imu_rate_ms) {

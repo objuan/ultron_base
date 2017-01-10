@@ -150,8 +150,10 @@ void MotorController::setVelocity(float leftSpeed, float rightSpeed) {
 }
 
 
-void MotorController::tick(long now)
+void MotorController::tick()
 {
+    long now = millis();
+    
     if ((now - lastMotorCommand) > auto_stop_interval) {;
       setMotorSpeeds(0, 0);
       moving = 0;
@@ -217,7 +219,7 @@ void MotorController::tick(long now)
         leftPID.TargetTicksPerFrame = v_left;//leftTicksPerFrame;
         rightPID.TargetTicksPerFrame = v_right;//rightTicksPerFrame;
       }
-      updatePID(t_pid);
+      updatePID(t_pid,nh);
 
 
       //  Set motor speeds in encoder ticks per PID loop
