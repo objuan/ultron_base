@@ -18,7 +18,7 @@ add_message_files(
   RobotStatus.msg
   RobotOdom.msg
   RobotIMU.msg
-  RobotSpeed.msg
+  RobotSpeed.msg	
 )
 
 add_service_files(
@@ -56,6 +56,7 @@ add_executable(ultron_node
   src/ultron_kernel.cpp
   src/ultron_hardware.cpp
   src/ultron_diagnostics.cpp)
+add_dependencies( ultron_node  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ultron_node  ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 #add_dependencies( ultron_node  ultron_node_msgs_generate_messages_cpp)
 
