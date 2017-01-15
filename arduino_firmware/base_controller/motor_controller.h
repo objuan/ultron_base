@@ -20,7 +20,8 @@ class MotorController
     float MAX_SPEED;
     float MAX_ACCELERATION;
     // seconds
-    float MOTOR_RATE;
+    float MOTOR_CONTROLLER_RATE;
+    float ODOM_STATE_RATE;
     float POLLING_TIMEOUT;
     
     //float MOTOR_CONTROLLER_RATE;
@@ -31,12 +32,13 @@ private:
     long lastMotorCommand;
     float ticks_per_meter;
 
-    long motor_rate_ms;
+    long motor_controller_rate_ms;
+    long odom_rate_ms;
     float ticks_per_meter_div_RATE;
     float ticks_per_meter_div_RATE_inv;
     
-    long t_pid,t_last;
-    bool doPublishSpace;
+    long t_pid,t_last_motor,t_last_odom;
+   // bool doPublishSpace;
 
 
     float max_acceleration_ticks;
@@ -44,11 +46,10 @@ private:
 
    // bool stopped;
   
-    int v_des_left;
-    int v_des_right;
+    int v_des_speed[4];
 
-    int v_left;
-    int v_right;
+    int v_speed[4];
+ 
 
    // posizione dei motori modulo ENCODER_RESOLUTION
     long left_pos_tick;
@@ -63,14 +64,18 @@ private:
 
     void init(ros::NodeHandle *nh);
     
-    void setPid();
+   // void setPid();
 
     // commands
 
     void stopAll();
+
+    // 
+    // Set speed for motor , speed is a number between -MOTOR_INPUT_LIMIT and MOTOR_INPUT_LIMIT
+    void setRawMotorSpeed(int motorID, int speed);
     
     // in m/sec
-    void setVelocity(float leftSpeedMS, float rightSpeedMS);
+    void setVelocity(const float* speed);
 
   
     void tick();

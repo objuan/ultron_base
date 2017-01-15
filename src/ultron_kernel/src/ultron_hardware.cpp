@@ -7,11 +7,12 @@
 
 namespace
 {
-  const uint8_t LEFT = 0, RIGHT = 1;
+ // const uint8_t FRONT_LEFT = 0, FRONT_RIGHT = 1;
 };
 
 namespace ultron_kernel
 {
+ int robotTOMPUMap[4];
 
   /**
   * Initialize Ultron hardware
@@ -30,16 +31,13 @@ namespace ultron_kernel
   //  private_nh_.param<double>("max_speed", max_speed_, 1.0);
   //  private_nh_.param<double>("polling_timeout_", polling_timeout_, 10.0);
 
-    //std::string port;
-    //private_nh_.param<std::string>("port", port, "/dev/prolific");
-
    // horizon_legacy::connect(port);
    // horizon_legacy::configureLimits(max_speed_, max_accel_);
 
     // ARDUINO INTERFACE
 
 
-    cmd_vel_pub_ = nh_.advertise<ultron_kernel::RobotOdom>("/petrorov/cmd_vel", 1);
+    cmd_vel_pub_ = nh_.advertise<ultron_kernel::RobotSpeed>("/petrorov/cmd_vel", 1);
 
     motor_state_sub_ = nh_.subscribe<ultron_kernel::RobotOdom>("/petrorov/base/motor_state", 1000,&UltronHardware::onMotorState,this );
 
@@ -47,7 +45,10 @@ namespace ultron_kernel
 
     hasMotorState=false;
 
-     ROS_INFO("CONTROL NODE INITIALIZED");
+
+
+    
+    ROS_INFO("CONTROL NODE INITIALIZED");
 
     resetTravelOffset();
     initializeDiagnostics();
@@ -215,6 +216,13 @@ namespace ultron_kernel
   */
   void UltronHardware::registerControlInterfaces()
   {
+
+    // ROBOT TO MPU MAP        
+    robotTOMPUMap[0] = 0;
+    robotTOMPUMap[1] = 2;
+    robotTOMPUMap[2] = 1;
+    robotTOMPUMap[3] = 3;
+
     ros::V_string joint_names = boost::assign::list_of("front_left_wheel")
       ("front_right_wheel")("rear_left_wheel")("rear_right_wheel");
     for (unsigned int i = 0; i < joint_names.size(); i++)
@@ -243,6 +251,8 @@ namespace ultron_kernel
     //diagnostic_publisher_.publish(ultron_status_msg_);
   }
 
+ 
+
   /**
   * Pull latest speed and travel measurements from MCU, and store in joint structure for ros_control
   */
@@ -254,8 +264,30 @@ namespace ultron_kernel
       if (!hasMotorState) return;
       hasMotorState=false; // consumo
 
+   	for (int i = 0; i < 4; i++)
+      	{
+                double delta = linearToAngular(lastMotorStateMsg.position[robotTOMPUMap[i]]) - joints_[i].position - joints_[i].position_offset;
 
+                if (std::abs(delta) < 1.0)
+                {
+                  joints_[i].position += delta;
+                }
+                else
+                {
+                  // suspicious! drop this measurement and update the offset for subsequent readings
+                  joints_[i].position_offset += delta;
+                  ROS_DEBUG("Dropping overflow measurement from encoder");
+                }
 
+                double speed = linearToAngular(lastMotorStateMsg.speed[robotTOMPUMap[i]]);
+
+                 ROS_DEBUG_STREAM("Received pos (" << i << ": " << (lastMotorStateMsg.position[robotTOMPUMap[i]]) << ")");
+                 ROS_DEBUG_STREAM("Received delta (" << i << ": " << delta << ")");
+                 ROS_DEBUG_STREAM("Received speed (" << i << ": " << speed << ")");
+
+                joints_[i].velocity = linearToAngular(speed);
+	}
+/*
       ROS_DEBUG_STREAM("Received travel information (L:" << lastMotorStateMsg.left_position  << " R:" << lastMotorStateMsg.right_position << ")");
 
       for (int i = 0; i < 4; i++)
@@ -283,62 +315,9 @@ namespace ultron_kernel
       {
            double speed = linearToAngular(( i %2 == 0) ? lastMotorStateMsg.left_speed : lastMotorStateMsg.right_speed);
            joints_[i].velocity = linearToAngular(speed);
-
-       /* if (i % 2 == LEFT)
-        {
-          joints_[i].velocity = linearToAngular(20);
-        }
-        else
-        { // assume RIGHT
-          joints_[i].velocity = linearToAngular(30);
-        }
-        */
       }
+*/
 
-
-      /*
-
-    horizon_legacy::Channel<clearpath::DataEncoders>::Ptr enc = horizon_legacy::Channel<clearpath::DataEncoders>::requestData(
-      polling_timeout_);
-    if (enc)
-    {
-      ROS_DEBUG_STREAM("Received travel information (L:" << enc->getTravel(LEFT) << " R:" << enc->getTravel(RIGHT) << ")");
-      for (int i = 0; i < 4; i++)
-      {
-        double delta = linearToAngular(enc->getTravel(i % 2)) - joints_[i].position - joints_[i].position_offset;
-
-        // detect suspiciously large readings, possibly from encoder rollover
-        if (std::abs(delta) < 1.0)
-        {
-          joints_[i].position += delta;
-        }
-        else
-        {
-          // suspicious! drop this measurement and update the offset for subsequent readings
-          joints_[i].position_offset += delta;
-          ROS_DEBUG("Dropping overflow measurement from encoder");
-        }
-      }
-    }
-
-    horizon_legacy::Channel<clearpath::DataDifferentialSpeed>::Ptr speed = horizon_legacy::Channel<clearpath::DataDifferentialSpeed>::requestData(
-      polling_timeout_);
-    if (speed)
-    {
-      ROS_DEBUG_STREAM("Received linear speed information (L:" << speed->getLeftSpeed() << " R:" << speed->getRightSpeed() << ")");
-      for (int i = 0; i < 4; i++)
-      {
-        if (i % 2 == LEFT)
-        {
-          joints_[i].velocity = linearToAngular(speed->getLeftSpeed());
-        }
-        else
-        { // assume RIGHT
-          joints_[i].velocity = linearToAngular(speed->getRightSpeed());
-        }
-      }
-    }
-    */
   }
 
   /**
@@ -347,23 +326,31 @@ namespace ultron_kernel
   */
   void UltronHardware::writeCommandsToHardware()
   {
-    double diff_speed_left = angularToLinear(joints_[LEFT].velocity_command);
-    double diff_speed_right = angularToLinear(joints_[RIGHT].velocity_command);
+
+   // double diff_speed_left = angularToLinear(joints_[LEFT].velocity_command);
+    //double diff_speed_right = angularToLinear(joints_[RIGHT].velocity_command);
 
 
     //ROS_INFO_STREAM("Received speed (L:" << diff_speed_left << " R:" << diff_speed_right << ")");
 
-    ultron_kernel::RobotOdom base_cmd;
+    ultron_kernel::RobotSpeed base_cmd;
 
     // metri al secondo
-    base_cmd.left_speed = diff_speed_left;
-    base_cmd.right_speed = diff_speed_right;
+// LEFT
+    base_cmd.speed[0] = angularToLinear(joints_[0].velocity_command);
+//base_cmd.speed[1] =base_cmd.speed[2] =base_cmd.speed[3] =0;
+    base_cmd.speed[1] = angularToLinear(joints_[2].velocity_command);
+//RIGHT
+    base_cmd.speed[2] = angularToLinear(joints_[1].velocity_command);
+    base_cmd.speed[3] = angularToLinear(joints_[3].velocity_command);
+   // base_cmd.right_speed = diff_speed_right;
 
     cmd_vel_pub_.publish(base_cmd);
 
   //  limitDifferentialSpeed(diff_speed_left, diff_speed_right);
 
   //  horizon_legacy::controlSpeed(diff_speed_left, diff_speed_right, max_accel_, max_accel_);
+
   }
 
   /**

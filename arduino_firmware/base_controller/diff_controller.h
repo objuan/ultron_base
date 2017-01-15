@@ -7,7 +7,7 @@
 #include "config.h"
 
 // FROM EXTERNAL
-void setMotorSpeeds(int leftSpeed, int rightSpeed);
+void setMotorSpeeds(int leftFrontSpeed, int leftBackSpeed, int rightFrontSpeed,int rightBackSpeed);
 extern float PID_INTERVAL_FLOAT;
 
 // 
@@ -39,7 +39,7 @@ typedef struct {
 
 SetPointInfo;
 
-SetPointInfo leftPID, rightPID;
+SetPointInfo motorPID[4];
 
 /* PID Parameters */
 int Kp = 20;
@@ -58,19 +58,18 @@ unsigned char moving = 0; // is the base in motion?
 * when going from stop to moving, that's why we can init everything on zero.
 */
 void resetPID(){
-   leftPID.TargetTicksPerFrame = 0.0;
-   leftPID.Encoder = readEncoder(MOTOR_LEFT);
-   leftPID.PrevEnc = leftPID.Encoder;
-   leftPID.output = 0;
-   leftPID.PrevInput = 0;
-   leftPID.ITerm = 0;
+  for(int i=0;i<4;i++)
+  {
+   motorPID[i].TargetTicksPerFrame = 0.0;
+   motorPID[i].Encoder = readEncoder(i);
+   motorPID[i].PrevEnc = motorPID[i].Encoder;
+   motorPID[i].output = 0;
+   motorPID[i].PrevInput = 0;
+   motorPID[i].PrevErr = 0;
+   motorPID[i].Ierror = 0;
+   motorPID[i].ITerm = 0;
 
-   rightPID.TargetTicksPerFrame = 0.0;
-   rightPID.Encoder = readEncoder(MOTOR_RIGHT);
-   rightPID.PrevEnc = rightPID.Encoder;
-   rightPID.output = 0;
-   rightPID.PrevInput = 0;
-   rightPID.ITerm = 0;
+  }
 }
 
 /* PID routine to compute the next motor commands */
@@ -83,6 +82,8 @@ void doPID(SetPointInfo * p,float frameTimeFactor){
 
   p->Delta = p->Encoder-p->PrevEnc;
   Perror = p->TargetTicksPerFrame - ( p->Delta);
+
+  frameTimeFactor=1;
           
   // Derivative error is the delta Perror
   output = (frameTimeFactor) * ((Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko);
@@ -147,14 +148,20 @@ void doPID_bo(SetPointInfo * p) {
 /* Read the encoder values and call the PID routine */
 void updatePID(float deltaTimeMS,ros::NodeHandle *nh) {
   /* Read the encoders */
-  leftPID.Encoder = readEncoder(MOTOR_LEFT);
-  rightPID.Encoder = readEncoder(MOTOR_RIGHT);
+
+  motorPID[0].Encoder = readEncoder(0);
+  motorPID[1].Encoder = readEncoder(1);
+  motorPID[2].Encoder = readEncoder(2);
+  motorPID[3].Encoder = readEncoder(3);
+  
+  //leftPID.Encoder = readEncoder(MOTOR_LEFT);
+  //rightPID.Encoder = readEncoder(MOTOR_RIGHT);
 
   #ifdef DEBUG_ENC
   Serial.print("L:");
-   Serial.println(leftPID.Encoder);
+   Serial.println(motorPID[0].Encoder);
    Serial.print("R:");
-   Serial.println(rightPID.Encoder);
+   Serial.println(motorPID[2].Encoder);
    #endif
   
   /* If we're not moving there is nothing more to do */
@@ -165,7 +172,11 @@ void updatePID(float deltaTimeMS,ros::NodeHandle *nh) {
     * PrevInput is considered a good proxy to detect
     * whether reset has already happened
     */
-    if (leftPID.PrevInput != 0 || rightPID.PrevInput != 0) resetPID();
+    #if 1
+        nh->loginfo("resetPID");
+#endif
+    //if (motorPID[0].PrevInput != 0 || motorPID[2].PrevInput != 0) 
+        resetPID();
     return;
   }
 
@@ -174,13 +185,23 @@ void updatePID(float deltaTimeMS,ros::NodeHandle *nh) {
   //dtostrf(frameTimeFactor,4,3,tmp_msg1);
   ///sprintf(log_msg, "DIFF: frameTimeFactor:%s ", tmp_msg1);
   //(*nh).loginfo(log_msg);
-  
-  
-  /* Compute PID update for each motor */
-  doPID(&rightPID,frameTimeFactor);
-  doPID(&leftPID,frameTimeFactor);
 
+  /* Compute PID update for each motor */
+  doPID(&motorPID[0],frameTimeFactor);
+  doPID(&motorPID[1],frameTimeFactor);
+  doPID(&motorPID[2],frameTimeFactor);
+  doPID(&motorPID[3],frameTimeFactor);
+
+#if 0
+        dtostrf(motorPID[0].Encoder,4,3,tmp_msg1);
+        dtostrf(motorPID[0].output,4,3,tmp_msg2);
+  
+        sprintf(log_msg, "TIME (%s , %s)", tmp_msg1,tmp_msg2);
+        nh->loginfo(log_msg);
+#endif
+
+  
   /* Set the motor speeds accordingly */
-  setMotorSpeeds(leftPID.output, rightPID.output);
+  setMotorSpeeds(motorPID[0].output, motorPID[1].output,motorPID[2].output,motorPID[3].output);
 }
 

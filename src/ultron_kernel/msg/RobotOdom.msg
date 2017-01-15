@@ -1,12 +1,11 @@
 
-# speed left right [m/sec]
-float32 left_speed
-float32 right_speed
+# order is FRONT_LEFT, BACK_LEFT, FRONT_RIGHT, BACK_RIGHT
+# speed  [m/sec]
+float32[4] speed
 
-# pos left right  [m]
-float32 left_position
-float32 right_position
+# pos   [m]
+float32[4] position
 
-# last pid time
+# last pid time, TODO TOGLIERE
 float32 lastPidTime
 

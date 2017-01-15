@@ -16,6 +16,7 @@
 #include <ultron_kernel/GetRobotInfo.h>
 #include <ultron_kernel/RobotInfo.h>
 #include <ultron_kernel/RobotOdom.h>
+#include <ultron_kernel/RobotSpeed.h>
 #include <ultron_kernel/RobotCommand.h>
 #include <ultron_kernel/GetDataEncoders.h>
 

@@ -18,6 +18,7 @@ add_message_files(
   RobotStatus.msg
   RobotOdom.msg
   RobotIMU.msg
+  RobotSpeed.msg
 )
 
 add_service_files(

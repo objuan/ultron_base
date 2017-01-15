@@ -35,7 +35,7 @@ void MDD10AMotorShield::init( ros::NodeHandle *nh)
   pinMode(_M2PWM,OUTPUT);
 
   inputToMotorFactor = float(MAX_PWM) / MOTOR_INPUT_LIMIT; //   // 51 / 80
-
+  
   /*#if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__)
   // Timer 1 configuration
   // prescaler: clockI/O / 1
@@ -57,10 +57,10 @@ void MDD10AMotorShield::init( ros::NodeHandle *nh)
 // Set speed for motor 1, speed is a number betwenn -400 and 400
 void MDD10AMotorShield::setM1Speed(int speed)
 {
-//  #ifdef DEBUG_MOTOR
-//  Serial.print("setM1Speed 1: ");
-//  Serial.println(speed);
-//  #endif
+ //#ifdef DEBUG_MOTOR
+  //Serial.print("setM1Speed 1: ");
+  //Serial.println(speed);
+  //#endif
   
   unsigned char reverse = 0;
   
@@ -76,11 +76,18 @@ void MDD10AMotorShield::setM1Speed(int speed)
   OCR1A = speed;
   #else*/
   #if ROS_LOG_ENABLED
-  //int debugValue = speed * inputToMotorFactor;
-  //Serial.println(debugValue);
-  //sprintf(log_msg, "setM1Speed (%d)", debugValue);
-  //(*nh).loginfo(log_msg);
+  int debugValue = speed * inputToMotorFactor;
+  Serial.println(debugValue);
+  sprintf(log_msg, "setM1Speed (%d)", debugValue);
+  (*nh).loginfo(log_msg);
   #endif
+
+  
+  // #ifdef DEBUG_MOTOR
+ // Serial.print("setM1Speed 1: ");
+ // Serial.println(speed * inputToMotorFactor);
+  //#endif
+
   
   analogWrite(_M1PWM,speed * inputToMotorFactor); // default to using analogWrite, mapping MOTOR_INPUT_LIMIT to 255
   //#endif

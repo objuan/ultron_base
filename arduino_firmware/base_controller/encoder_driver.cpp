@@ -5,46 +5,54 @@
 #include <Encoder.h>
 #include "config.h"
 
-  Encoder left_enc (LEFT_ENC_PIN_A, LEFT_ENC_PIN_B);
-  Encoder right_enc (RIGHT_ENC_PIN_A, RIGHT_ENC_PIN_B);
+struct EncInfo
+{
+  Encoder* encoder;
 
-  long left_enc_pos_base=0;
-  long left_enc_pos;
+  long enc_pos_base;
+  long enc_pos;
+  void init()
+  {
+    enc_pos_base=enc_pos=0;
+  }
 
-  long right_enc_pos_base=0;
-  long right_enc_pos;
+};
 
+EncInfo encoders[4];
 
+  void initEncoders(){
+    encoders[0].encoder = new Encoder(ENC_FRONT_LEFT_PIN_A,ENC_FRONT_LEFT_PIN_B);
+    encoders[1].encoder = new Encoder(ENC_BACK_LEFT_PIN_A,ENC_BACK_LEFT_PIN_B);
+    encoders[2].encoder = new Encoder(ENC_FRONT_RIGHT_PIN_A,ENC_FRONT_RIGHT_PIN_B);
+    encoders[3].encoder = new Encoder(ENC_BACK_RIGHT_PIN_A,ENC_BACK_RIGHT_PIN_B);
+    encoders[0].init();
+    encoders[1].init();
+    encoders[2].init();
+    encoders[3].init();
+  }
+  
   /* Wrap the encoder reading function */
   long readEncoder(int i) {
-    if (i == MOTOR_LEFT) {
-      left_enc_pos = left_enc.read() - left_enc_pos_base;
-      return left_enc_pos;
-    }
-    else
-    {
-      right_enc_pos = right_enc.read() - right_enc_pos_base;
-      return right_enc_pos;
-    }
+   
+      encoders[i].enc_pos = encoders[i].encoder->read() -  encoders[i].enc_pos_base;
+      return encoders[i].enc_pos;
+   
   }
 
   /* Wrap the encoder reset function */
   void resetEncoder(int i) {
-    if (i == MOTOR_LEFT){
-      left_enc_pos=0L;
-      left_enc_pos_base = left_enc.read();
-      return;
-    } else { 
-      right_enc_pos=0L;
-      right_enc_pos_base = right_enc.read();
-      return;
-    }
+
+     encoders[i].enc_pos=0L;
+     encoders[i].enc_pos_base = encoders[i].encoder->read() ;
+     return;
   }
 
 /* Wrap the encoder reset function */
 void resetEncoders() {
-  resetEncoder(MOTOR_LEFT);
-  resetEncoder(MOTOR_RIGHT);
+  resetEncoder(MOTOR_FRONT_LEFT);
+  resetEncoder(MOTOR_FRONT_RIGHT);
+  resetEncoder(MOTOR_BACK_LEFT);
+  resetEncoder(MOTOR_BACK_RIGHT);
 }
 
 

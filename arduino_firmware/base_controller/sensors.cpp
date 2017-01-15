@@ -566,6 +566,9 @@ void SensorManager:: init(ros::NodeHandle *nh)
 
   for(int i=0;i<ultrasonicCount;i++)
   {
+    sprintf(log_msg, "RANGE INIT: :%s ", ultrasonicNames[i]);
+    (*nh).loginfo(log_msg);
+    
     //rangeList[i] = new  Ultrasonic(trig[i],echo[i]);  // (Trig PIN,Echo PIN)
     rangeList[i] = new  NewPing(trig[i],echo[i],MAX_RANGE_CM);  // (Trig PIN,Echo PIN)
   }
@@ -605,6 +608,8 @@ bool sendIMU = false;
 
 void SensorManager::tick()
 {
+  #ifdef RANGE_ENABLE
+  
   long now = millis();
    if ((now - last_time_range) > range_rate_ms) {
       last_time_range = now;
@@ -618,7 +623,7 @@ void SensorManager::tick()
           pub_range.publish(&range_msg);
        }
    }
-
+#endif
  #ifdef IMU_ENABLE
    if (sendIMU)
    {

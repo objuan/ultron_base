@@ -23,12 +23,10 @@
 /* Serial port baud rate */
 #define BAUDRATE     115200 // 57600 115200
 
-/* Run the PID loop at 30 times per second */
-//#define PID_RATE       30     // Hz
-
-/* Convert the rate into an interval */
-//#define PID_INTERVAL_FLOAT  (1000.0 / PID_RATE)
-
+// OK OFF
+#define BATTERY_ENABLED 1
+#define RANGE_ENABLE
+//#define IMU_ENABLE    1
 
 // ============ MOTOR ======
 
@@ -56,16 +54,15 @@
 #define ROS_TOPIC_STOP_SRV "/petrorov/base/srv/stop"
 #define ROS_TOPIC_GET_DATA_ENCODERS_SRV "/petrorov/base/srv/getDataEncoders"
 
-// =========================
-//    CMD
-// =========================
-
-#define MOTOR_LEFT            0
-#define MOTOR_RIGHT           1
 
 // =========================
 // MOTOR
 // =========================
+
+#define MOTOR_FRONT_LEFT            0
+#define MOTOR_BACK_LEFT             1
+#define MOTOR_FRONT_RIGHT           2
+#define MOTOR_BACK_RIGHT            3
 
 /*
  *  SCHEMA PIN
@@ -75,23 +72,28 @@
 
 // STESSO ORDINE DELLA SCHEDA
 
-#define LEFT_ENG_DIR 10
-#define LEFT_ENG_PWM 11
+#define FRONT_LEFT_DIR 5
+#define FRONT_LEFT_PWM 6
+#define BACK_LEFT_DIR 7
+#define BACK_LEFT_PWM 8
 
-#define RIGHT_ENG_DIR 8
-#define RIGHT_ENG_PWM 9
+#define FRONT_RIGHT_DIR 9
+#define FRONT_RIGHT_PWM 10
+#define BACK_RIGHT_DIR 11
+#define BACK_RIGHT_PWM 12
 
 
 // INVERT SIGN, 1 , -1
 
 #define MOTOR_LEFT_SIGN 1
-#define MOTOR_RIGHT_SIGN -1
+#define MOTOR_RIGHT_SIGN 1
 
 // 16MHz / 1 (prescaler) / 2 (phase-correct) / 400 (top) = 20kHz
 #define MOTOR_INPUT_LIMIT 255
 
 /* Maximum PWM signal */
 #define MAX_PWM      255 // MOTOR_INPUT_LIMIT // 255
+
 // =========================
 // ENCODER
 // =========================
@@ -116,16 +118,23 @@
 //   Low Performance:  neither pin has interrupt capability
 //   avoid using pins with LEDs attached
 // NOTA, 2,3 hanno gli interrupt
-#define LEFT_ENC_PIN_A PD3  //pin 2
-#define LEFT_ENC_PIN_B PD5  //pin 3
+#define ENC_FRONT_LEFT_PIN_A 20 // PD3  //pin 2
+#define ENC_FRONT_LEFT_PIN_B 22 // PD5  //pin 3
   
 //below can be changed, but should be PORTC pins
-#define RIGHT_ENC_PIN_A PC2  //pin A4
-#define RIGHT_ENC_PIN_B PC4   //pin A5
+#define ENC_BACK_LEFT_PIN_A   21 // PC2//pin A4
+#define ENC_BACK_LEFT_PIN_B   23  // PC4 pin A5
+
+#define ENC_FRONT_RIGHT_PIN_A   19 // PC2//pin A4
+#define ENC_FRONT_RIGHT_PIN_B   25  // PC4 pin A5
+
+#define ENC_BACK_RIGHT_PIN_A   18 // PC2//pin A4
+#define ENC_BACK_RIGHT_PIN_B   24  // PC4 pin A5
 
 // =========================
 // BATTERY LEVEL
 // =========================
+
 
 #define BATTERY_PIN_ANAG_A A6
 #define BATTERY_PIN_ANAG_B A7
@@ -137,7 +146,8 @@
 
 //  (Trig PIN,Echo PIN,NAME)
 //#define RANGE_SENSOR_LIST      "4,5,FRONT,6,7,BACK"
-#define RANGE_SENSOR_LIST      "24,22,/ultrasound_front"
+//##define RANGE_SENSOR_LIST      "48,49,/ultrasound_front"
+#define RANGE_SENSOR_LIST      "44,47,/ultrasound_front,48,49,/ultrasound_back"
 
 // =======================
 
@@ -145,7 +155,7 @@
 // IMU , MEGA CONFIG
 // =========================
 
-//#define IMU_ENABLE    1
+
 #define IMU_INT_PIN   19  // 19
 #define IMU_LED_PIN   13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
 #define IMU_SDA_PIN   20

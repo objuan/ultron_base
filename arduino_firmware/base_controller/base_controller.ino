@@ -11,6 +11,7 @@
 #include <ultron_kernel/GetRobotInfo.h>
 #include <ultron_kernel/RobotCommand.h>
 #include <ultron_kernel/RobotOdom.h>
+#include <ultron_kernel/RobotSpeed.h>
 #include <ultron_kernel/GetDataEncoders.h>
 
 #include "config.h"
@@ -58,18 +59,21 @@ BatteryState battery_2("BAT_NUMH_2",BATTERY_PIN_ANAG_B, 1.0 / (R2/(R1+R2) ),sens
 
 #include "MDD10AMotorShieldV1.0.h"
 
-MDD10AMotorShield drive(LEFT_ENG_DIR,LEFT_ENG_PWM, RIGHT_ENG_DIR,RIGHT_ENG_PWM);
+//MDD10AMotorShield drive(LEFT_ENG_DIR,LEFT_ENG_PWM, RIGHT_ENG_DIR,RIGHT_ENG_PWM);
 
 // FROM DIFFERENCIAL API
 
+
 /* Wrap the drive motor set speed function */
+/*
 void setMotorSpeed(int i, int spd) {
   if (i == MOTOR_LEFT) 
     drive.setM1Speed(spd * MOTOR_LEFT_SIGN);
   else 
     drive.setM2Speed(spd * MOTOR_RIGHT_SIGN);
 }
-  
+*/
+  /*
 // A convenience function for setting both motor speeds
 // Set speed for motor 1, speed is a number between -MOTOR_INPUT_LIMIT and MOTOR_INPUT_LIMIT
 void setMotorSpeeds(int leftSpeed, int rightSpeed) {
@@ -82,7 +86,7 @@ void setMotorSpeeds(int leftSpeed, int rightSpeed) {
     setMotorSpeed(MOTOR_LEFT, leftSpeed);
     setMotorSpeed(MOTOR_RIGHT, rightSpeed);
 }
-  
+ */ 
 // ----------------
 //  SENSORS
 // ----------------
@@ -115,19 +119,12 @@ MotorController motorController;
 // twist_msg.linear.x = LEFT MOTOR
 // twist_msg.linear.y = RIGHT MOTOR
 // values are in m/sec
-void cmd_vel_callback( const ultron_kernel::RobotOdom& move_msg) {
- #ifdef ROS_LOG_ENABLED
-  dtostrf(move_msg.left_speed,4,3,tmp_msg1);
-  dtostrf(move_msg.right_speed,4,3,tmp_msg2);
-  
- // sprintf(log_msg, "cmd_vel_callback (%s , %s)", tmp_msg1,tmp_msg2);
-  //nh.loginfo(log_msg);
-#endif
+void cmd_vel_callback( const ultron_kernel::RobotSpeed& move_msg) {
 
-  motorController.setVelocity(move_msg.left_speed,move_msg.right_speed);
+  motorController.setVelocity(move_msg.speed);
 }
 
-ros::Subscriber<ultron_kernel::RobotOdom> cmd_vel_topic(ROS_TOPIC_VELOCITY_IN, &cmd_vel_callback);
+ros::Subscriber<ultron_kernel::RobotSpeed> cmd_vel_topic(ROS_TOPIC_VELOCITY_IN, &cmd_vel_callback);
 
 // ----------------
 //  SERVICE
@@ -196,7 +193,7 @@ void setup() {
   Serial.println("Init Message Test");
   Serial.println("DEBUG MODE");
 
-  //motorController.init(NULL);
+  motorController.init(NULL);
 
   sensorManager.setup(NULL);
   sensorManager.init(NULL);
@@ -264,19 +261,24 @@ void loop_debug(){
 
 #ifdef DEBUG_MOTOR
 
-  int DEBUG_SIDE = MOTOR_RIGHT;
+  int DEBUG_SIDE1 = MOTOR_FRONT_LEFT;
+  int DEBUG_SIDE2 = MOTOR_FRONT_RIGHT;
 
-  for(int i=0;i<255;i+=3)
+  for(int i=0;i<100;i+=3)
   {
-      setMotorSpeed(DEBUG_SIDE, i);
-      //setMotorSpeed(RIGHT, i);
+      motorController.setRawMotorSpeed(DEBUG_SIDE1, i);
+      motorController.setRawMotorSpeed(DEBUG_SIDE2, i);
+
       Serial.print("MOTOR SET");
       Serial.println(i);
 
 #ifdef DEBUG_ENC
-      long enc = readEncoder(DEBUG_SIDE);
+      long enc1 = readEncoder(DEBUG_SIDE1);
+      long enc2 = readEncoder(DEBUG_SIDE2);
       Serial.print("ENV VALUE ");
-      Serial.println(enc);
+      Serial.print(enc1);
+      Serial.print(" ");
+      Serial.println(enc2);
 #endif
       delay(100);
 
@@ -329,9 +331,6 @@ void first_loop() {
 
   sensorManager.init(&nh);
   
-    // ports
-  drive.init(&nh);
-
   nh.loginfo("Robot setup complete");
 
   // params
@@ -404,6 +403,8 @@ void loop() {
 
    if ((now - lastDiagnosticTime) > diagnostic_rate_ms) {
       lastDiagnosticTime = now;
+
+      #ifdef BATTERY_ENABLED
       float bat1 = battery_1.readValue();
       float bat2 = battery_2.readValue();
 
@@ -412,6 +413,7 @@ void loop() {
 
       sensor_msgs::BatteryState &batteryState_msg2 = battery_2.getMessage();
       battery_pub2.publish(&batteryState_msg2);
+      #endif
     }
   
   // ------------------

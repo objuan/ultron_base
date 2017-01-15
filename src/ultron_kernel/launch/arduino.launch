@@ -26,8 +26,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
-     <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB1)" />
      <arg name="port_base" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB0)" />
+     <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB1)" />
+
 
       <!-- Petrorov arduino driver -->
 
@@ -57,9 +58,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             polling_timeout: 2.0
             
-            motor_rate : 30.0
+            motor_controller_rate : 30.0
+            odom_state_rate : 10
             diagnostic_rate: 1.0
             range_sensor_rate: 10.0
+            
+            Kp : 10
+            Kd : 10
+            Ki : 0
+            Ko : 0
         </rosparam>
     </node>
 
