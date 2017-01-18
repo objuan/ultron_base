@@ -5,8 +5,10 @@
 
 
 //#define DEBUG_MOTOR 1
-//#define DEBUG_BATTERY 1
 //#define DEBUG_ENC 1
+
+//#define DEBUG_BATTERY 1
+
 //#define DEBUG_RANGE 1
 //#define DEBUG_IMU 1
 
@@ -146,8 +148,9 @@
 
 //  (Trig PIN,Echo PIN,NAME)
 //#define RANGE_SENSOR_LIST      "4,5,FRONT,6,7,BACK"
-//##define RANGE_SENSOR_LIST      "48,49,/ultrasound_front"
-#define RANGE_SENSOR_LIST      "44,47,/ultrasound_front,48,49,/ultrasound_back"
+//#define RANGE_SENSOR_LIST      "48,49,/ultrasound_front"
+#define RANGE_SENSOR_LIST      "50,51,/ultrasound_back"
+#define RANGE_SENSOR_LIST      "48,49,/ultrasound_front,50,51,/ultrasound_back"
 
 // =======================
 

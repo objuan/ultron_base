@@ -115,3 +115,9 @@ export ULTRON_GAZEBO_DESCRIPTION=$(rospack find ultron_gazebo)/urdf/description.
 roslaunch ultron_gazebo ultron_empty_world.launch world_name:=worlds/willowgarage.world
 
 roslaunch ultron_gazebo ultron_empty_world.launch
+
+
+// RVIZ
+
+$ roslaunch ultron_viz view_robot.launch
+

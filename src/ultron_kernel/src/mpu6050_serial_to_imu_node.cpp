@@ -8,6 +8,7 @@
 #include <string>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
+#include <nav_msgs/Odometry.h>
 
 bool zero_orientation_set = false;
 
@@ -28,6 +29,7 @@ int main(int argc, char** argv)
   std::string frame_id;
   double time_offset_in_seconds;
   bool broadcast_tf;
+  bool broadcast_odom;
   double linear_acceleration_stddev;
   double angular_velocity_stddev;
   double orientation_stddev;
@@ -47,14 +49,17 @@ int main(int argc, char** argv)
   private_node_handle.param<std::string>("frame_id", frame_id, "imu_link");
   private_node_handle.param<double>("time_offset_in_seconds", time_offset_in_seconds, 0.0);
   private_node_handle.param<bool>("broadcast_tf", broadcast_tf, true);
+  private_node_handle.param<bool>("broadcast_odom", broadcast_odom, true);
   private_node_handle.param<double>("linear_acceleration_stddev", linear_acceleration_stddev, 0.0);
   private_node_handle.param<double>("angular_velocity_stddev", angular_velocity_stddev, 0.0);
   private_node_handle.param<double>("orientation_stddev", orientation_stddev, 0.0);
 
-  ros::NodeHandle nh("imu");
-  ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("data", 50);
-  ros::Publisher imu_temperature_pub = nh.advertise<sensor_msgs::Temperature>("temperature", 50);
-  ros::ServiceServer service = nh.advertiseService("set_zero_orientation", set_zero_orientation);
+  ros::NodeHandle nh;
+  ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data", 50);
+  ros::Publisher imu_temperature_pub = nh.advertise<sensor_msgs::Temperature>("imu/temperature", 50);
+  ros::ServiceServer service = nh.advertiseService("imu/set_zero_orientation", set_zero_orientation);
+
+  //ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
   ros::Rate r(60); // 200 hz
 
@@ -204,6 +209,28 @@ int main(int argc, char** argv)
                   transform.setRotation(differential_rotation);
                   tf_br.sendTransform(tf::StampedTransform(transform, measurement_time, tf_parent_frame_id, tf_frame_id));
                 }
+
+		// publish ODOM
+		if (broadcast_odom)
+                {
+                  	nav_msgs::Odometry odom;
+       			odom.header.stamp = measurement_time;
+       			odom.header.frame_id ="odom";
+			odom.pose.pose.position.x = 0;
+			odom.pose.pose.position.y = 0;
+		       odom.pose.pose.position.z = 0.0;
+		       odom.pose.pose.orientation = imu.orientation;
+		   
+		       //set the velocity
+		       odom.child_frame_id = tf_frame_id;
+		       odom.twist.twist.linear.x = 0;
+		       odom.twist.twist.linear.y = 0;
+		       odom.twist.twist.angular.z = 0;
+
+			//odom_pub.publish(odom);
+                }
+
+
                 input.erase(0, data_packet_start + 28); // delete everything up to and including the processed packet
               }
               else

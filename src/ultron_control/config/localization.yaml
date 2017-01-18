@@ -2,25 +2,57 @@ odom_frame: odom
 base_link_frame: base_link
 world_frame: odom
 
-two_d_mode: true
+#This effectively zeros out the 3D pose variables in every measurement and forces them to be fused in the state estimate.
+#two_d_mode: true
+two_d_mode: false
 
 frequency: 50
 
+#Note
+#The order of the boolean values are 
+# X,Y,Z,
+# roll,pitch,yaw,
+# X˙,Y˙,Z˙,
+# roll˙,pitch˙,yaw˙,
+# X¨,Y¨,Z¨).
+
+# solo velocità X˙,Y˙,Z˙, SOLO X ????
 odom0: ultron_velocity_controller/odom
 odom0_config: [false, false, false,
                false, false, false,
                true, true, true,
                false, false, true,
                false, false, false]
+#odom0_config: [false, false, false,
+#               false, false, false,
+#               true, true, false,
+#               false, false, true,
+#               false, false, false]
+
 odom0_differential: false
 odom0_queue_size: 10
 
+#The order of the boolean values are (
+# X,Y,Z,
+# roll,pitch,yaw,
+# X˙,Y˙,Z˙,
+# roll˙,pitch˙,yaw˙,
+# X¨,Y¨,Z¨).
+
+# solo roll,pitch,yaw, mettere solo yaw ??
 imu0: imu/data
+#imu0_config: [false, false, false,
+#              true, true, true,
+#              false, false, false,
+#              true, true, true,
+#              false, false, false]
 imu0_config: [false, false, false,
-              true, true, true,
               false, false, false,
-              true, true, true,
+              false, false, false,
+              false, false, false,
               false, false, false]
-imu0_differential: true
+#imu0_differential: true
+imu0_differential: false
 imu0_queue_size: 10
+#imu0_relative: true
 imu0_remove_gravitational_acceleration: true

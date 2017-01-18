@@ -79,14 +79,15 @@ void doPID(SetPointInfo * p,float frameTimeFactor){
   long output;
 
  // p->TargetTicksPerFrame = 200;
-
-  p->Delta = p->Encoder-p->PrevEnc;
+  // encoder e' soggetto a frameTimeFactor
+  p->Delta = frameTimeFactor * ((p->Encoder)-p->PrevEnc);
+  
   Perror = p->TargetTicksPerFrame - ( p->Delta);
 
-  frameTimeFactor=1;
+ // frameTimeFactor=1;
           
   // Derivative error is the delta Perror
-  output = (frameTimeFactor) * ((Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko);
+  output = ((Kp*Perror + Kd*(Perror - p->PrevErr) + Ki*p->Ierror)/Ko);
   
   p->PrevErr = Perror;
   p->PrevEnc = p->Encoder;
@@ -180,7 +181,7 @@ void updatePID(float deltaTimeMS,ros::NodeHandle *nh) {
     return;
   }
 
-  float frameTimeFactor= deltaTimeMS / PID_INTERVAL_FLOAT;
+  float frameTimeFactor=  PID_INTERVAL_FLOAT / deltaTimeMS;
 
   //dtostrf(frameTimeFactor,4,3,tmp_msg1);
   ///sprintf(log_msg, "DIFF: frameTimeFactor:%s ", tmp_msg1);

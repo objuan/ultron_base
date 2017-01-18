@@ -190,7 +190,6 @@ void setup() {
 #ifdef DEBUG_MODE
   Serial.begin(BAUDRATE);
   while (!Serial); // wait for Leonardo enumeration, others continue immediately
-  Serial.println("Init Message Test");
   Serial.println("DEBUG MODE");
 
   motorController.init(NULL);
