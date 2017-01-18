@@ -4,7 +4,7 @@ world_frame: odom
 
 #This effectively zeros out the 3D pose variables in every measurement and forces them to be fused in the state estimate.
 #two_d_mode: true
-two_d_mode: false
+two_d_mode: true
 
 frequency: 50
 
@@ -21,15 +21,15 @@ odom0: ultron_velocity_controller/odom
 odom0_config: [false, false, false,
                false, false, false,
                true, true, true,
-               false, false, true,
+               false, false, false,
                false, false, false]
 #odom0_config: [false, false, false,
 #               false, false, false,
-#               true, true, false,
+#               true, true, true,
 #               false, false, true,
 #               false, false, false]
 
-odom0_differential: false
+odom0_differential: true
 odom0_queue_size: 10
 
 #The order of the boolean values are (
@@ -47,12 +47,12 @@ imu0: imu/data
 #              true, true, true,
 #              false, false, false]
 imu0_config: [false, false, false,
+              false, false, true,
               false, false, false,
-              false, false, false,
-              false, false, false,
+              false, false, true,
               false, false, false]
-#imu0_differential: true
-imu0_differential: false
+imu0_differential: true
+#imu0_differential: false
 imu0_queue_size: 10
-#imu0_relative: true
+imu0_relative: true
 imu0_remove_gravitational_acceleration: true

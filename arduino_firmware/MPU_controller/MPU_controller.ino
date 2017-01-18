@@ -158,18 +158,20 @@ void setup() {
     devStatus = mpu.dmpInitialize();
 
 /*
- * Sensor readings with offsets: 1 -4  16376 -1  1 0
-Your offsets: 885 -5647 978 46  6 -7
+ * 
+Sensor readings with offsets:  0 -2  16388 0 0 2
+Your offsets: 869 -5624 960 -74 24  230
+
 
 Data is printed as: acelX acelY acelZ giroX giroY giroZ
  */
     // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXAccelOffset(885);
-    mpu.setYAccelOffset(-5647);
-    mpu.setZAccelOffset(978);
-    mpu.setXGyroOffset(46);
-    mpu.setYGyroOffset(6);
-    mpu.setZGyroOffset(-7);
+    mpu.setXAccelOffset(869);
+    mpu.setYAccelOffset(-5624);
+    mpu.setZAccelOffset(960);
+    mpu.setXGyroOffset(-74);
+    mpu.setYGyroOffset(24);
+    mpu.setZGyroOffset(230);
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -286,6 +288,7 @@ void loop() {
         teapotPacket[19] = fifoBuffer[33];
         teapotPacket[20] = fifoBuffer[36];
         teapotPacket[21] = fifoBuffer[37];
+        
         //temperature
         int16_t temperature = mpu.getTemperature();
         teapotPacket[22] = temperature >> 8;

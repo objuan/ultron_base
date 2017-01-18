@@ -140,8 +140,8 @@
       <child link="inertial_link" />
     </joint>
 
-    <!-- IMU Link is the standard mounting position for the UM6 IMU.-->
-    <!-- Can be modified with environment variables in /etc/ros/setup.bash -->
+    <!-- IMU Link is the standard mounting position for the  IMU.-->
+    <!-- Il sistena di asse e' diverso yaw = M_PI-->
     <xacro:if value="$(arg imu_enabled)">
         <link name="imu_link">
 	        <visual>
@@ -155,7 +155,7 @@
                 </visual>
         </link>
         <joint name="imu_joint" type="fixed">
-                <origin xyz="0 0 -${base_z_size}" rpy="0 0 0" />
+                <origin xyz="0 0 -${base_z_size + 0.01}" rpy="0 0 -${M_PI}" />
                 <parent link="base_link" />
                 <child link="imu_link" />
        </joint>
