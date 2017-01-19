@@ -8,8 +8,9 @@
   <xacro:arg name="laser_rpy" default="$(optenv HUSKY_LMS1XX_RPY 0.0 0.0 0.0)" />
 
   <xacro:arg name="kinect_enabled" default="false" />
-  <xacro:arg name="kinect_xyz" default="0 0 0)" />
-  <xacro:arg name="kinect_rpy" default="0 0.18 3.14)" />
+  <xacro:arg name="kinect_xyz" default="0 0 0.03" />
+  <xacro:arg name="kinect_rpy" default="0 0 3.1415" />
+  <!--<xacro:arg name="kinect_rpy" default="0 0.18 3.1415" />-->
 
   <xacro:arg name="imu_enabled" default="true" />
 
@@ -37,7 +38,7 @@
   <property name="border_y_size" value="0.06" />
 
   <!-- Top Plate -->
-  <property name="top_plate_xy_ray" value="0.13" />
+  <property name="top_plate_xy_ray" value="0.155" />
   <property name="top_plate_z_size" value="0.012" />
   <property name="top_plate_z_pos" value="0.253" />
 
@@ -225,12 +226,13 @@
 
     <xacro:if value="$(arg kinect_enabled)">
 
-    <xacro:sensor_arch prefix="" parent="top_plate_link">
-      <origin xyz="-0.35 0 0.51" rpy="0 0 -3.14"/>
-    </xacro:sensor_arch>
+   <!-- <xacro:sensor_arch prefix="" parent="top_plate_link">
+      <origin xyz="0 0 0" rpy="0 0 -3.14"/>
+    </xacro:sensor_arch>-->
+
     <joint name="kinect_frame_joint" type="fixed">
       <origin xyz="$(arg kinect_xyz)" rpy="$(arg kinect_rpy)" />
-      <parent link="sensor_arch_mount_link"/>
+      <parent link="top_plate_link"/>
       <child link="camera_link"/>
     </joint>
 

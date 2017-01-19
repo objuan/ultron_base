@@ -4,8 +4,8 @@
 
   <xacro:arg name="laser_enabled" default="false" />
   <xacro:arg name="ur5_enabled" default="false" />
-  <xacro:arg name="kinect_enabled" default="false" />
-  <xacro:arg name="imu_enabled" default="false" />
+  <xacro:arg name="kinect_enabled" default="true" />
+  <xacro:arg name="imu_enabled" default="true" />
 
   <xacro:include filename="$(find ultron_description)/urdf/ultron.urdf.xacro" />
   <xacro:ultron_robot />

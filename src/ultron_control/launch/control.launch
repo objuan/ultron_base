@@ -8,7 +8,7 @@
   <arg name="config_extras" default="$(eval optenv('ULTRON_CONFIG_EXTRAS', find('ultron_control') + '/config/empty.yaml'))"/>
 
   <arg name="laser_enabled" default="$(optenv ULTRON_LMS1XX_ENABLED false)"/>
-  <arg name="kinect_enabled" default="$(optenv ULTRON_UR5_ENABLED false)"/>
+  <arg name="kinect_enabled" default="$(optenv ULTRON_UR5_ENABLED true)"/>
   <arg name="urdf_extras" default="$(optenv ULTRON_URDF_EXTRAS)"/>
 
   <!--<include file="$(find multimaster_launch)/launch/multimaster_robot.launch">
