@@ -4,7 +4,7 @@
 
    <arg name="robot_namespace" default="/"/>
   <arg name="laser_enabled" default="$(optenv ULTRON_LMS1XX_ENABLED false)"/>
-  <arg name="kinect_enabled" default="$(optenv ULTRON_KINECT_ENABLED false)"/>
+  <arg name="kinect_enabled" default="$(optenv ULTRON_KINECT_ENABLED true)"/>
   <arg name="urdf_extras" default="$(optenv ULTRON_URDF_EXTRAS)"/>
 
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find ultron_description)/urdf/ultron.urdf.xacro'

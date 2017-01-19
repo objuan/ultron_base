@@ -8,8 +8,8 @@
   <xacro:arg name="laser_rpy" default="$(optenv HUSKY_LMS1XX_RPY 0.0 0.0 0.0)" />
 
   <xacro:arg name="kinect_enabled" default="false" />
-  <xacro:arg name="kinect_xyz" default="$(optenv HUSKY_KINECT_XYZ 0 0 0)" />
-  <xacro:arg name="kinect_rpy" default="$(optenv HUSKY_KINECT_RPY 0 0.18 3.14)" />
+  <xacro:arg name="kinect_xyz" default="0 0 0)" />
+  <xacro:arg name="kinect_rpy" default="0 0.18 3.14)" />
 
   <xacro:arg name="imu_enabled" default="true" />
 
@@ -35,6 +35,11 @@
   <!-- Border Side -->
   <property name="border_x_size" value="0.13" />
   <property name="border_y_size" value="0.06" />
+
+  <!-- Top Plate -->
+  <property name="top_plate_xy_ray" value="0.13" />
+  <property name="top_plate_z_size" value="0.012" />
+  <property name="top_plate_z_pos" value="0.253" />
 
   <!-- Wheel Mounting Positions -->
   <!-- dimensione del perimetro di attacco delle ruote--> 
@@ -113,6 +118,32 @@
       <origin xyz="0 -0.17 0" rpy="0 0 0" />
       <parent link="base_link" />
       <child link="base_link_platform_right" />
+    </joint>
+
+   <!-- pezzo su -->
+
+    <link name="top_plate_link">
+        <visual>
+	        <origin xyz="0 0 -${top_plate_z_size/2}" rpy="0 0 0" />
+                <geometry>
+                        <cylinder length="${top_plate_z_size}" radius="${top_plate_xy_ray}"/>
+                </geometry>
+                 <material name="gray">
+		  <color rgba="0.5 0.5 0.5 1"/>
+		</material>
+        </visual>
+        <collision>
+                <origin xyz="0 0 -${top_plate_z_size/2}" rpy="0 0 0" />
+                <geometry>
+                         <cylinder length="${top_plate_z_size}" radius="${top_plate_xy_ray}"/>
+                </geometry>
+      </collision>
+    </link>
+
+    <joint name="base_link_top_plate_link_joint" type="fixed">
+      <origin xyz="0 0 ${top_plate_z_pos}" rpy="0 0 0" />
+      <parent link="base_link" />
+      <child link="top_plate_link" />
     </joint>
 
 

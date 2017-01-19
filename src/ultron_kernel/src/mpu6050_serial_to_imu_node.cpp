@@ -30,9 +30,10 @@ int main(int argc, char** argv)
   double time_offset_in_seconds;
   bool broadcast_tf;
   bool broadcast_odom;
-  double linear_acceleration_stddev;
-  double angular_velocity_stddev;
-  double orientation_stddev;
+  double linear_acceleration_stdev_;
+  double angular_velocity_stdev_;
+  double orientation_stddev_,pitch_roll_stdev_,yaw_stdev_;
+  double linear_acceleration_covariance,angular_velocity_covariance,pitch_roll_covariance,yaw_covariance,orientation_covariance;
   uint8_t last_received_message_number;
   bool received_message = false;
   int data_packet_start;
@@ -50,14 +51,36 @@ int main(int argc, char** argv)
   private_node_handle.param<double>("time_offset_in_seconds", time_offset_in_seconds, 0.0);
   private_node_handle.param<bool>("broadcast_tf", broadcast_tf, true);
   private_node_handle.param<bool>("broadcast_odom", broadcast_odom, true);
-  private_node_handle.param<double>("linear_acceleration_stddev", linear_acceleration_stddev, 0.0);
-  private_node_handle.param<double>("angular_velocity_stddev", angular_velocity_stddev, 0.0);
-  private_node_handle.param<double>("orientation_stddev", orientation_stddev, 0.0);
+  //private_node_handle.param<double>("linear_acceleration_stddev", linear_acceleration_stddev, 0.0);
+  //private_node_handle.param<double>("angular_velocity_stddev", angular_velocity_stddev, 0.0);
+  //private_node_handle.param<double>("orientation_stddev", orientation_stddev, 0.0);
 
   ros::NodeHandle nh;
   ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data", 50);
   ros::Publisher imu_temperature_pub = nh.advertise<sensor_msgs::Temperature>("imu/temperature", 50);
   ros::ServiceServer service = nh.advertiseService("imu/set_zero_orientation", set_zero_orientation);
+
+  // NOISE PERFORMANCE: Power Spectral Density @10Hz, AFS_SEL=0 & ODR=1kHz 400 ug/√Hz (probably wrong)
+    private_node_handle.param("linear_acceleration_stdev", linear_acceleration_stdev_, (400 / 1000000.0) * 9.807 );
+
+    // Total RMS Noise: DLPFCFG=2 (100Hz) 0.05 º/s-rms (probably lower (?) @ 42Hz)
+    private_node_handle.param("angular_velocity_stdev", angular_velocity_stdev_, 0.05 * (M_PI / 180.0));
+
+    // 1 degree for pitch and roll
+   // private_node_handle.param("orientation_stddev", orientation_stddev_, 1.0 * (M_PI / 180.0));
+
+    // 1 degree for pitch and roll
+    private_node_handle.param("pitch_roll_stdev", pitch_roll_stdev_, 1.0 * (M_PI / 180.0));
+
+    // 5 degrees for yaw
+    private_node_handle.param("yaw_stdev", yaw_stdev_, 5.0 * (M_PI / 180.0));
+
+    angular_velocity_covariance = angular_velocity_stdev_ * angular_velocity_stdev_;
+    linear_acceleration_covariance = linear_acceleration_stdev_ * linear_acceleration_stdev_;
+   // orientation_covariance = orientation_stddev_ * orientation_stddev_;
+    pitch_roll_covariance = pitch_roll_stdev_ * pitch_roll_stdev_;
+    yaw_covariance = yaw_stdev_ * yaw_stdev_;
+
 
   //ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
@@ -65,17 +88,21 @@ int main(int argc, char** argv)
 
   sensor_msgs::Imu imu;
 
-  imu.linear_acceleration_covariance[0] = linear_acceleration_stddev;
-  imu.linear_acceleration_covariance[4] = linear_acceleration_stddev;
-  imu.linear_acceleration_covariance[8] = linear_acceleration_stddev;
+  imu.linear_acceleration_covariance[0] = linear_acceleration_covariance;
+  imu.linear_acceleration_covariance[4] = linear_acceleration_covariance;
+  imu.linear_acceleration_covariance[8] = linear_acceleration_covariance;
 
-  imu.angular_velocity_covariance[0] = angular_velocity_stddev;
-  imu.angular_velocity_covariance[4] = angular_velocity_stddev;
-  imu.angular_velocity_covariance[8] = angular_velocity_stddev;
+  imu.angular_velocity_covariance[0] = angular_velocity_covariance;
+  imu.angular_velocity_covariance[4] = angular_velocity_covariance;
+  imu.angular_velocity_covariance[8] = angular_velocity_covariance;
 
-  imu.orientation_covariance[0] = orientation_stddev;
-  imu.orientation_covariance[4] = orientation_stddev;
-  imu.orientation_covariance[8] = orientation_stddev;
+ // imu.orientation_covariance[0] = orientation_covariance;
+ // imu.orientation_covariance[4] = orientation_covariance;
+ // imu.orientation_covariance[8] = orientation_covariance;
+  imu.orientation_covariance[0] = pitch_roll_covariance;
+  imu.orientation_covariance[4] = pitch_roll_covariance;
+  imu.orientation_covariance[8] = yaw_covariance;
+
 
   sensor_msgs::Temperature temperature_msg;
   temperature_msg.variance = 0;
