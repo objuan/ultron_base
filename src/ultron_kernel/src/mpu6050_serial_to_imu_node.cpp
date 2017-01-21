@@ -37,6 +37,7 @@ int main(int argc, char** argv)
   uint8_t last_received_message_number;
   bool received_message = false;
   int data_packet_start;
+  double imu_rate;
 
   tf::Quaternion orientation;
   tf::Quaternion zero_orientation;
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
   private_node_handle.param<double>("time_offset_in_seconds", time_offset_in_seconds, 0.0);
   private_node_handle.param<bool>("broadcast_tf", broadcast_tf, true);
   private_node_handle.param<bool>("broadcast_odom", broadcast_odom, true);
+  private_node_handle.param<double>("imu_rate", imu_rate, 200.0);
   //private_node_handle.param<double>("linear_acceleration_stddev", linear_acceleration_stddev, 0.0);
   //private_node_handle.param<double>("angular_velocity_stddev", angular_velocity_stddev, 0.0);
   //private_node_handle.param<double>("orientation_stddev", orientation_stddev, 0.0);
@@ -84,7 +86,10 @@ int main(int argc, char** argv)
 
   //ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
-  ros::Rate r(60); // 200 hz
+  ros::Rate rate(5); // 200 hz
+  //ros::Rate rate(1000.0 / imu_rate); // 200 hz
+
+  ROS_INFO_STREAM("PARAM: rate " << imu_rate);
 
   sensor_msgs::Imu imu;
 
@@ -286,6 +291,8 @@ int main(int argc, char** argv)
         // try and open the serial port
         try
         {
+          ROS_INFO_STREAM("Open serial port: " << port);
+
           ser.setPort(port);
           ser.setBaudrate(115200);
           serial::Timeout to = serial::Timeout::simpleTimeout(1000);
@@ -310,6 +317,6 @@ int main(int argc, char** argv)
       ser.close();
     }
     ros::spinOnce();
-    r.sleep();
+    rate.sleep();
   }
 }

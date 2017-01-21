@@ -8,8 +8,6 @@
   <xacro:arg name="laser_rpy" default="$(optenv HUSKY_LMS1XX_RPY 0.0 0.0 0.0)" />
 
   <xacro:arg name="kinect_enabled" default="false" />
-  <xacro:arg name="kinect_xyz" default="0 0 0.03" />
-  <xacro:arg name="kinect_rpy" default="0 0 3.1415" />
   <!--<xacro:arg name="kinect_rpy" default="0 0.18 3.1415" />-->
 
   <xacro:arg name="imu_enabled" default="true" />
@@ -53,7 +51,9 @@
   <xacro:property name="wheel_length" value="0.025" />
   <xacro:property name="wheel_radius" value="0.075" />
 
-
+  <!-- KInect Properties -->
+  <xacro:arg name="kinect_xyz" default="0 0 0.03" />
+  <xacro:arg name="kinect_rpy" default="0 0 0" />
 
     <!-- Base link is the center of the robot's bottom plate -->
     <link name="base_link">

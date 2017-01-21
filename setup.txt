@@ -98,15 +98,15 @@ Hold button 1 (the deadman switch) and you should be driving.
 // ================================================
 
 roscore
-rosparam set enable_odom_tf true
+rosparam set enable_odom_tf true // non usare
 rosparam set use_sim_time true
 roslaunch ultron_viz view_robot.launch
 roslaunch ultron_navigation gmapping_demo.launch 
 rosbag play --clock file.bag
 
-// ============
-
-// ================================================
+// ==================================
+// SIMULATORE
+// ==================================
 
 Simulating Ultron
 

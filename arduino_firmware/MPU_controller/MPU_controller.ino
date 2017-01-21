@@ -1,3 +1,16 @@
+// ========================================================================
+//MODIFICHE
+#define SAMPLE_RATE 120
+
+//#define DEBUG_HZ_MODE 1
+
+#if (DEBUG_HZ_MODE)
+  #define DEBUG_MODE
+#endif
+
+long lastDelta = 0;
+
+// ========================================================================
 // I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
 // 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
 // Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
@@ -115,7 +128,10 @@ void dmpDataReady() {
     mpuInterrupt = true;
 }
 
+ // ============== MODIFICA
 
+long last_time_ms;
+long sample_rate_ms;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -124,8 +140,11 @@ void dmpDataReady() {
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-        Wire.begin();
-      //  Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+        Wire.begin(); // default = 100Z
+        Wire.setClock(100000L);
+       // i2c_cfg.speed = I2C_SLOW;
+      //         Wire.setClock(10000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+ //       Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
        TWBR =12; // 24
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
@@ -157,6 +176,11 @@ void setup() {
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu.dmpInitialize();
 
+    // ============== MODIFICA
+    sample_rate_ms = 1000 / SAMPLE_RATE;
+    last_time_ms = millis();
+
+   Serial.println(F("DONE"));
 /*
  * 
 Sensor readings with offsets:  0 -2  16388 0 0 2
@@ -181,7 +205,8 @@ Data is printed as: acelX acelY acelZ giroX giroY giroZ
 
         // enable Arduino interrupt detection
         Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
-        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+       // attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+        attachInterrupt(0, dmpDataReady, RISING);
         mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
@@ -210,12 +235,29 @@ Data is printed as: acelX acelY acelZ giroX giroY giroZ
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
 
+
+
 void loop() {
     // if programming failed, don't try to do anything
     if (!dmpReady) return;
 
+#if 0 
+      long now = millis();
+      lastDelta = now- last_time_ms;
+    //  if (now-last_time_ms < sample_rate_ms)
+   //   {
+     //     return;
+   //   }
+   //   else
+   
+        last_time_ms = now;
+
+#endif
+     
+      
+   // modificato per non farlo piantare
     // wait for MPU interrupt or extra packet(s) available
-    while (!mpuInterrupt && fifoCount < packetSize) {
+    if (!mpuInterrupt && fifoCount < packetSize) {
         // other program behavior stuff here
         // .
         // .
@@ -226,8 +268,10 @@ void loop() {
         // .
         // .
         // .
-        // Serial.println(F("ddd!"));
-    }
+      //  Serial.println(F("WAIT!"));
+        delay(1);
+        return;
+    } 
 
     // reset interrupt flag and get INT_STATUS byte
     mpuInterrupt = false;
@@ -236,26 +280,61 @@ void loop() {
     // get current FIFO count
     fifoCount = mpu.getFIFOCount();
 
-  // Serial.println(fifoCount);
+   //Serial.println(fifoCount);
 
+#ifdef DEBUG_HZ_MODE 
+        long now = millis();
+        lastDelta = now- last_time_ms;
+        last_time_ms = now;
+
+        Serial.print(F("STACK: "));
+        Serial.print(fifoCount);
+        Serial.print(F(" INT: "));
+        Serial.print(mpuIntStatus);
+        Serial.print(F(" DELTA: "));
+        Serial.println(1000.0 / lastDelta);
+ #endif
+         
     // check for overflow (this should never happen unless our code is too inefficient)
-    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+    if (mpuIntStatus & 0x10) {
         // reset so we can continue cleanly
-       
+        Serial.println(F("INT BO!"));
+       //  delay(1);
+        //r//eturn;
+        
+    //   #if defined(DEBUG_MODE)
+      //  Serial.println(F("FIFO overflow!"));
+       // #endif
+        mpu.resetFIFO();
+        return;
+    }
+    else if (fifoCount == 1024) {
+        // reset so we can continue cleanly
+
+       #if defined(DEBUG_MODE)
         Serial.println(F("FIFO overflow!"));
+        #endif
         mpu.resetFIFO();
        
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
+
+       
+         
         // wait for correct available data length, should be a VERY short wait
        //  Serial.println(F("aa"));
         if (fifoCount < packetSize) 
         {
          // fifoCount = mpu.getFIFOCount();
+         #if  defined(DEBUG_MODE)
+          Serial.println(F("FIFO not ready!"));
+          #endif
           delay(10);
           return;
           //Serial.println(fifoCount);
         }
+
+        
         //   Serial.println(F("bb"));
 
         // read a packet from FIFO
@@ -293,7 +372,13 @@ void loop() {
         int16_t temperature = mpu.getTemperature();
         teapotPacket[22] = temperature >> 8;
         teapotPacket[23] = temperature & 0xFF;
+        
+        #if !defined(DEBUG_MODE)
         Serial.write(teapotPacket, 28);
+        #endif
+        
+       
+
         teapotPacket[25]++; // packetCount, loops at 0xFF on purpose
 
         // blink LED to indicate activity
