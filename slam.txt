@@ -2,6 +2,9 @@
  PROGRAMMI MIEI
 ==========================================
 
+export ROS_MASTER_URI=http://circolus:11311/
+export ROS_MASTER_URI=http://localhost:11311/
+
 //  -- lancio kinect  -- 
 roslaunch slam freenect.launch
 
@@ -13,7 +16,6 @@ roslaunch slam freenect_throttle.launch
 // con kinect , scan 2d simulato e ODOM
 
 roslaunch slam kinect_scan.launch
-
 
 
 
@@ -49,10 +51,12 @@ $ roslaunch rtabmap_ros rgbd_mapping.launch rtabmap_args:="--delete_db_on_start"
 
 REMOTE
 
-$ roslaunch freenect_throttle.launch rate:=5
+$ roslaunch slam freenect_throttle.launch rate:=5
+
 
 CLIENT
 
 $ roslaunch rtabmap_ros rtabmap.launch rgb_topic:=/camera/data_throttled_image depth_topic:=/camera/data_throttled_image_depth camera_info_topic:=/camera/data_throttled_camera_info compressed:=true rtabmap_args:="--delete_db_on_start"
+
 
 
