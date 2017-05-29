@@ -33,6 +33,34 @@ setup del file di modello, fatto in automatico con source devel/setup.sh
 sh /home/marco/petrorov/ultron_ws/src/ultron/ultron_description/env-hooks/50.ultron_description.sh
 
 // ==================================
+// paccketti
+// ==================================
+inserire shadow in source list+
+- 
+ros-kinetic-*
+/home/marco/catkin_ws/src/geographic_info
+/home/marco/catkin_ws/src/imu_tools
+/home/marco/catkin_ws/src/interactive_marker_twist_server
+/home/marco/catkin_ws/src/multimaster_fkie
+/home/marco/catkin_ws/src/robot_localization
+/home/marco/catkin_ws/src/ros_control
+/home/marco/catkin_ws/src/rosserial
+?? /home/marco/catkin_ws/src/serial
+/home/marco/catkin_ws/src/teleop_twist_joy
+/home/marco/catkin_ws/src/twist_mux
+ ?? /home/marco/catkin_ws/src/universal_robot
+?? /home/marco/catkin_ws/src/usb_cam
+ros-kinetic-multimaster-launch
+ros-kinetic-serial
+
+istallare
+
+da sudo
+source /home/marco/.bashrc
+catkin_make install
+$ catkin_make -DCMAKE_INSTALL_PREFIX=/opt/ros/kinetic install
+
+// ==================================
 // ULTRON KERNEL
 // ==================================
 

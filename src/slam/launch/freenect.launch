@@ -1,6 +1,0 @@
-<launch>
-  <include file="$(find freenect_launch)/launch/freenect.launch">
-     <arg name="depth_registration" value="True" />
-  </include>
-   
-</launch>
