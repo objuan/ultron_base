@@ -566,14 +566,19 @@ void SensorManager:: init(ros::NodeHandle *nh)
 
   for(int i=0;i<ultrasonicCount;i++)
   {
+ //   #ifndef   DEBUG_RANGE
+  #if OO
+
     sprintf(log_msg, "RANGE INIT: :%s ", ultrasonicNames[i]);
     (*nh).loginfo(log_msg);
+    #endif
     
     //rangeList[i] = new  Ultrasonic(trig[i],echo[i]);  // (Trig PIN,Echo PIN)
     rangeList[i] = new  NewPing(trig[i],echo[i],MAX_RANGE_CM);  // (Trig PIN,Echo PIN)
   }
 
  init_mpu();
+
 }
 
 SensorManager::~SensorManager()
