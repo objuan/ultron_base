@@ -17,6 +17,7 @@ sudo chmod 666 /dev/ttyUSB0
 
 sudo -s // diritti di sudo permanenti
 
+sudo usermod -a -G dialout $USER
 ---------------------------------------------------------------------
 // UTILITA
 ---------------------------------------------------------------------
