@@ -121,6 +121,8 @@ MotorController motorController;
 // values are in m/sec
 void cmd_vel_callback( const ultron_kernel::RobotSpeed& move_msg) {
 
+  nh.loginfo("cmd_vel_callback");
+  
   motorController.setVelocity(move_msg.speed);
 }
 
@@ -194,10 +196,18 @@ void setup() {
 
   motorController.init(NULL);
 
+Serial.println("1");
+
   sensorManager.setup(NULL);
+
+  Serial.println("2");
   sensorManager.init(NULL);
+
+  Serial.println("3");
   return;
  #endif
+
+  while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
   sensorManager.pre_setup_mpu();
   
@@ -234,7 +244,7 @@ void setup() {
   nh.advertiseService(getDataEncoders_srv);
 
 
-  nh.serviceClient(connect_client);
+  //nh.serviceClient(connect_client);
 
   // Wait for ROSserial to connect
   /*while (!nh.connected()) 

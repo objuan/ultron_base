@@ -25,3 +25,47 @@ SERIAL
 https://github.com/wjwwood/serial
 
 
+USO DI SHADOW
+
+
+// ==================================
+// paccketti
+// ==================================
+inserire shadow in source list+
+
+/etc/apt/sources.list.d/ros-latest.list
+
+#deb http://packages.ros.org/ros/ubuntu xenial main
+deb http://packages.ros.org/ros-shadow-fixed/ubuntu xenial main
+
+sudo apt-get update
+
+- 
+ros-kinetic-*
+
+sudo apt-get install ros-kinetic-geographic-info
+sudo apt-get install ros-kinetic-rosserial ros-kinetic-rosserial-arduino ros-kinetic-rosserial-client ros-kinetic-rosserial-server
+
+/home/marco/catkin_ws/src/geographic_info
+/home/marco/catkin_ws/src/imu_tools
+/home/marco/catkin_ws/src/interactive_marker_twist_server
+/home/marco/catkin_ws/src/multimaster_fkie
+/home/marco/catkin_ws/src/robot_localization
+/home/marco/catkin_ws/src/ros_control
+/home/marco/catkin_ws/src/rosserial
+/home/marco/catkin_ws/src/rosserial
+/home/marco/catkin_ws/src/serial
+/home/marco/catkin_ws/src/teleop_twist_joy
+/home/marco/catkin_ws/src/twist_mux
+ ?? /home/marco/catkin_ws/src/universal_robot
+?? /home/marco/catkin_ws/src/usb_cam
+ros-kinetic-multimaster-launch
+ros-kinetic-serial
+
+istallare
+
+da sudo
+source /home/marco/.bashrc
+catkin_make install
+$ catkin_make -DCMAKE_INSTALL_PREFIX=/opt/ros/kinetic install
+
