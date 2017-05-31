@@ -29,8 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <env name="ROS_LOG_DIR" value="$(find ultron_kernel)/log"/>
     
-    <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB0)" />
+<!-- non utili ?? -->
+  <!--  <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB0)" />
     <arg name="port_base" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB1)" />
+-->
 
  	
 

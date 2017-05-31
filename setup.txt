@@ -40,11 +40,16 @@ sh /home/marco/petrorov/ultron_ws/src/ultron/ultron_description/env-hooks/50.ult
 
 lancio solo arduino
 
-$ roslaunch ultron_kernel arduino.launch port_base:=/dev/ttyUSB0
+$ roslaunch ultron_kernel arduino.launch port_base:=/dev/ttyUSB0 port_base:=/dev/ttyUSB0
+
 
 lancio ROBOT con arduino
 
 $ roslaunch ultron_kernel base.launch 
+
+lancio ROBOT con arduino su berry senza localizzazione
+
+$ roslaunch ultron_kernel berry.launch port_base:=/dev/ttyUSB0 port_imu:=/dev/ttyUSB0
 
 
 lancio ROBOT con arduino senza localizzazione
