@@ -38,6 +38,33 @@ sh /home/marco/petrorov/ultron_ws/src/ultron/ultron_description/env-hooks/50.ult
 // ULTRON KERNEL
 // ==================================
 
+// ----------
+// BERRY 
+// ----------
+
+lancio ROBOT con arduino su berry senza localizzazione, solo nodo e arduino
+
+$ roslaunch ultron_kernel berry.launch port_base:=/dev/ttyUSB0 port_imu:=/dev/ttyUSB0
+
+
+// ----------
+// PC 
+// ----------
+
+lancio ROBOT  senza HW 
+
+$ roslaunch ultron_kernel base_bulk.launch 
+
+lancio ROBOT  con HW 
+
+$ roslaunch ultron_kernel base_full.launch 
+
+
+// ----------
+// TEST 
+// ----------
+
+
 lancio solo arduino
 
 $ roslaunch ultron_kernel arduino.launch port_base:=/dev/ttyUSB0 port_base:=/dev/ttyUSB0
@@ -46,10 +73,6 @@ $ roslaunch ultron_kernel arduino.launch port_base:=/dev/ttyUSB0 port_base:=/dev
 lancio ROBOT con arduino
 
 $ roslaunch ultron_kernel base.launch 
-
-lancio ROBOT con arduino su berry senza localizzazione
-
-$ roslaunch ultron_kernel berry.launch port_base:=/dev/ttyUSB0 port_imu:=/dev/ttyUSB0
 
 
 lancio ROBOT con arduino senza localizzazione
@@ -60,6 +83,7 @@ $ roslaunch ultron_kernel base_noloc.launch
 lancio ROBOT senza arduino
 
 $ roslaunch ultron_kernel base_nohw.launch 
+
 
 //VISUALIZZAZIONE MODELLO
 

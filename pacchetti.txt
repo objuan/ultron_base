@@ -61,6 +61,7 @@ sudo apt-get install ros-kinetic-rosserial ros-kinetic-rosserial-arduino ros-kin
 ?? /home/marco/catkin_ws/src/usb_cam
 ros-kinetic-multimaster-launch
 ros-kinetic-serial
+sudo apt-get install ros-kinetic-lms1xx
 
 istallare
 
