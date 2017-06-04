@@ -8,8 +8,9 @@ export ROS_MASTER_URI=http://localhost:11311/
 //  -- lancio kinect  -- 
 roslaunch slam freenect.launch
 
+#decimation, riduce la size dell'immagine
 con HZ = 5
-roslaunch slam freenect_throttle.launch
+roslaunch slam freenect_throttle.launch decimation:=2
 
 
 //  -- lancio rtabmap  -- 
@@ -18,6 +19,16 @@ roslaunch slam freenect_throttle.launch
 roslaunch slam kinect_scan.launch
 
 
+==========================
+TUTTO SU BERRY
+==========================
+
+$ roslaunch freenect_launch freenect.launch depth_registration:=true data_skip:=2
+
+$ roslaunch rtabmap_ros rgbd_mapping.launch rtabmap_args:="--delete_db_on_start --Vis/MaxFeatures 500 --Mem/ImagePreDecimation 2 --Mem/ImagePostDecimation 2 --Kp/DetectorStrategy 6 --OdomF2M/MaxSize 1000 --Odom/ImageDecimation 2" rtabmapviz:=false
+
+
+To increase odometry frame rate, input images are decimated by 2. This gives around 175 ms per frame for odometry. At 175 ms per frame, we don't need 30 Hz kinect frames, so data_skip is set to 2 to save some computation time. Here is the CPU usage on RPi ("nodelet" is freenect_launch): 
 
 
 ==========================================

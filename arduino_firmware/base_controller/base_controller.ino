@@ -121,7 +121,7 @@ MotorController motorController;
 // values are in m/sec
 void cmd_vel_callback( const ultron_kernel::RobotSpeed& move_msg) {
 
-  nh.loginfo("cmd_vel_callback");
+  //nh.loginfo("cmd_vel_callback");
   
   motorController.setVelocity(move_msg.speed);
 }

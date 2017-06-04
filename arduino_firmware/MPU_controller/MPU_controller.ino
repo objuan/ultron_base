@@ -1,8 +1,12 @@
+
 // ========================================================================
 //MODIFICHE
 #define SAMPLE_RATE 120
 
+#define SAMPLE_RATE_CONTROLLER 50
+
 //#define DEBUG_HZ_MODE 1
+#define DEBUG_REMOTE_CONT_MODE 1
 
 #if (DEBUG_HZ_MODE)
   #define DEBUG_MODE
@@ -10,6 +14,11 @@
 
 long lastDelta = 0;
 
+//==================================================
+//remote 
+#include "RemoteController.h"
+
+RemoteController remoteController;
 // ========================================================================
 // I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
 // 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
@@ -133,9 +142,14 @@ void dmpDataReady() {
 long last_time_ms;
 long sample_rate_ms;
 
+
+long last_time_ms_controller;
+long sample_rate_ms_controller;
+
 // ================================================================
 // ===                      INITIAL SETUP                       ===
-// ================================================================
+// ================================================================file:///home/marco/petrorov/ultron_base/arduino_firmware/RemoteController/Test2.ino
+
 
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -180,6 +194,11 @@ void setup() {
     sample_rate_ms = 1000 / SAMPLE_RATE;
     last_time_ms = millis();
 
+  // ---
+    remoteController.setup();
+    sample_rate_ms_controller = 1000 / SAMPLE_RATE_CONTROLLER;
+    last_time_ms_controller = millis();
+    
    Serial.println(F("DONE"));
 /*
  * 
@@ -238,6 +257,17 @@ Data is printed as: acelX acelY acelZ giroX giroY giroZ
 
 
 void loop() {
+      // --- CONTROLLER
+     long now = millis();
+     if (now-last_time_ms_controller > sample_rate_ms_controller)
+     {
+        last_time_ms_controller = now;
+        
+        remoteController.loop();
+     }
+     // ---------------------------
+     
+  
     // if programming failed, don't try to do anything
     if (!dmpReady) return;
 
