@@ -69,7 +69,8 @@ roslint_cpp(
 )
 
 add_executable(mpu6050_serial_to_imu_node 
-  src/mpu6050_serial_to_imu_node.cpp)
+  src/mpu6050_serial_to_imu_node.cpp
+  src/RemoteController.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(mpu6050_serial_to_imu_node

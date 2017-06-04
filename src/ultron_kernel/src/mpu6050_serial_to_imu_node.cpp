@@ -10,6 +10,8 @@
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/Odometry.h>
 
+#include "RemoteController.h"
+
 bool zero_orientation_set = false;
 
 bool set_zero_orientation(std_srvs::Empty::Request&,
@@ -42,7 +44,7 @@ int main(int argc, char** argv)
   tf::Quaternion orientation;
   tf::Quaternion zero_orientation;
 
-  ros::init(argc, argv, "mpu6050_serial_to_imu_node");
+  ros::init(argc, argv, "mpu_rc_node");
 
   ros::NodeHandle private_node_handle("~");
   private_node_handle.param<std::string>("port", port, "/dev/ttyACM0");
@@ -86,7 +88,8 @@ int main(int argc, char** argv)
 
   //ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
-  ros::Rate rate(5); // 200 hz
+  ros::Rate rate(100); // 100 HZ
+ // ros::Rate rate(5); // 200 hz
   //ros::Rate rate(1000.0 / imu_rate); // 200 hz
 
   ROS_INFO_STREAM("PARAM: rate " << imu_rate);
@@ -119,6 +122,11 @@ int main(int argc, char** argv)
   std::string input;
   std::string read;
 
+
+  RemoteController rc;
+
+  rc.init(private_node_handle,nh);
+
   while(ros::ok())
   {
     try
@@ -131,12 +139,20 @@ int main(int argc, char** argv)
           read = ser.read(ser.available());
           ROS_DEBUG("read %i new characters from serial port, adding to %i characters of old input.", (int)read.size(), (int)input.size());
           input += read;
-          while (input.length() >= 28) // while there might be a complete package in input
+          while (input.length() >= 8)//28) // while there might be a complete package in input
           {
             //parse for data packets
+ 	    data_packet_start = input.find("$\x09");
+            if (data_packet_start != std::string::npos)
+	    {
+//ROS_INFO("A");
+		rc.onReceive(data_packet_start,input);
+	    }
             data_packet_start = input.find("$\x03");
             if (data_packet_start != std::string::npos)
             {
+		if (input.length() < 28) continue;
+
               ROS_DEBUG("found possible start of data packet at position %d", data_packet_start);
               if ((input.length() >= data_packet_start + 28) && (input.compare(data_packet_start + 26, 2, "\n\r")))  //check if positions 26,27 exist, then test values
               {

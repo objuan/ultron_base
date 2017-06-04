@@ -6,7 +6,7 @@
 #define SAMPLE_RATE_CONTROLLER 50
 
 //#define DEBUG_HZ_MODE 1
-#define DEBUG_REMOTE_CONT_MODE 1
+//#define DEBUG_REMOTE_CONT_MODE 1
 
 #if (DEBUG_HZ_MODE)
   #define DEBUG_MODE
@@ -265,6 +265,7 @@ void loop() {
         
         remoteController.loop();
      }
+     //return;
      // ---------------------------
      
   

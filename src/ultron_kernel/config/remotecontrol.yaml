@@ -1,0 +1,13 @@
+petrorov:
+  ultron:
+     remote_control:
+#format min,max,base
+        speed: [1120,1768,1120]
+        turn: [1072,1896,1472]
+        normalize: true
+        dead_zone:  40
+#format FX = (X + [0]) * [1]
+        speed_trx : [0,1]
+        turn_trx : [0,1]
+  #      turn_trx : [-0.5,2]
+    

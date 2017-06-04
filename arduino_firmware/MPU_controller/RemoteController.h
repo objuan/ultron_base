@@ -71,14 +71,14 @@ public:
   #if !defined(DEBUG_REMOTE_CONT_MODE)
         // from 0 to 1024
 
-        int16_t ch1 = constraint(rc_values[RC_CH1],1024,2048) - 1024);
-        int16_t ch2 = constraint(rc_values[RC_CH2],1024,2048) - 1024);
+        int16_t ch1 = rc_values[RC_CH1];//constrain(rc_values[RC_CH1],1024,2048) - 1024;
+        int16_t ch2 = rc_values[RC_CH2];//constrain(rc_values[RC_CH2],1024,2048) - 1024;
         
         remoteControllerPacket[2] = ch1 >> 8;
         remoteControllerPacket[3] = ch1 & 0xFF;
 
-        remoteControllerPacket[4] = ch1 >> 8;
-        remoteControllerPacket[5] = ch1 & 0xFF;
+        remoteControllerPacket[4] = ch2 >> 8;
+        remoteControllerPacket[5] = ch2 & 0xFF;
         
         Serial.write(remoteControllerPacket, 8);
    #endif
