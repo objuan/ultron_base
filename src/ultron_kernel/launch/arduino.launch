@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<param name="linear_acceleration_stddev" value="0"/>
 	<param name="angular_velocity_stddev" value="0"/>
 	<param name="orientation_stddev" value="0"/>
+	<remap from="joy" to="joy_teleop/joy" />
     </node>
 
      <!-- rate are in HZ -->
