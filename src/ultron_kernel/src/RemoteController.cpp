@@ -35,10 +35,11 @@ void RemoteController::init(ros::NodeHandle private_nh,ros::NodeHandle nh)
       	tv.tv_sec = 1;
       	tv.tv_usec = 0;
 
-	joy_msg.buttons.resize(2);
+	joy_msg.buttons.resize(3);
 	joy_msg.axes.resize(4);
-	joy_msg.buttons[0]= 0;
-	joy_msg.buttons[1]= 0;
+	joy_msg.buttons[0]= 1; // enable
+	joy_msg.buttons[1]= 1;
+	joy_msg.buttons[2]= 1;	// turbo
 }
 
 // =====================================================

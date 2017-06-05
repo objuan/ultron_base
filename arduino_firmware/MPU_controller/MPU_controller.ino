@@ -8,7 +8,7 @@
 //#define DEBUG_HZ_MODE 1
 //#define DEBUG_REMOTE_CONT_MODE 1
 
-#if (DEBUG_HZ_MODE)
+#if (DEBUG_HZ_MODE | DEBUG_REMOTE_CONT_MODE)
   #define DEBUG_MODE
 #endif
 
@@ -265,7 +265,7 @@ void loop() {
         
         remoteController.loop();
      }
-     //return;
+     return;
      // ---------------------------
      
   

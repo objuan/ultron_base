@@ -2,11 +2,12 @@
 <launch>
 
   <!--params -->
-  <rosparam file="$(find ultron_kernel)/config/remotecontrol.yaml" />
+  <rosparam file="$(find ultron_kernel)/config/rc_hobbyking.yaml" />
 
 
   <node pkg="ultron_kernel" type="mpu6050_serial_to_imu_node" name="mpu6050_serial_to_imu_node" required="true">
     <param name="port" value="/dev/ttyUSB0"/>
+    <remap from="joy" to="joy_teleop/joy" /> 
   </node>
 
   <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find ultron_kernel)/rviz/demo.rviz" required="true"/>-->
