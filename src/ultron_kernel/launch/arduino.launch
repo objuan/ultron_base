@@ -26,9 +26,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
+	
+  
      <arg name="port_base" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB0)" />
      <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB1)" />
 
+     <!--params -->
+     <rosparam file="$(find ultron_kernel)/config/rc_hobbyking.yaml" />
 
        <!-- Petrorov arduino driver -->
        <!-- ATTENZIONE broadcast_tf va conflitto con ekf_localization ??
