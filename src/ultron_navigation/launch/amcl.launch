@@ -23,10 +23,12 @@ OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTE
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<!-- ORIGINAL Version from husky clearpath: https://github.com/husky/husky  -->
 <launch>
 
   <arg name="use_map_topic" default="true"/>
   <arg name="scan_topic" default="scan" />
+  <arg name="map_topic" default="map" />
 
   <node pkg="amcl" type="amcl" name="amcl">
     <param name="use_map_topic" value="$(arg use_map_topic)"/>
@@ -63,6 +65,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
     <param name="recovery_alpha_slow" value="0.0"/>
     <param name="recovery_alpha_fast" value="0.0"/>
     <remap from="scan" to="$(arg scan_topic)"/>
+    <remap from="map" to="$(arg map_topic)"/>
   </node>
 
 </launch>
