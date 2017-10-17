@@ -1,0 +1,20 @@
+<library path="src">
+  <class name="picodex_plugins/MagneticFieldCalib" type="rqt_picodex.MagCalibrator.MagCalibratorPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Magnetometer Calibrator
+    </description>
+    <qtgui>
+ <!--
+      <group>
+        <label>Picodex</label>
+      </group>
+     <group>
+        <label>Subgroup</label>
+      </group>
+    -->
+      <label>Mag Calibrator</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Magnetometer Calibrator.</statustip>
+    </qtgui>
+  </class>
+</library>

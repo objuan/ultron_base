@@ -1,0 +1,12 @@
+<library path="lib/libpicodex_rviz_plugins">
+
+<class name="picodex_plugins/Compass" type="picodex_plugins::MagDisplay" base_class_type="rviz::Display">
+   <description>
+      Displays direction from sensor_msgs/MagneticField messages.
+    </description>
+</class>
+
+</library>
+<!-- TEST:
+rospack plugins --attrib=plugin rviz
+-->

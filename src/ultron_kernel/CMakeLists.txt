@@ -77,8 +77,19 @@ target_link_libraries(mpu6050_serial_to_imu_node
   ${catkin_LIBRARIES}
 )
 
-roslaunch_add_file_check(launch)
+add_executable(mpu9250_serial_to_imu_node 
+  src/mpu9250_serial_to_imu_node.cpp
+## src/fusion/RTFusion.cpp
+##  src/fusion/RTFusionRTQF.cpp
+  src/RemoteController.cpp)
 
+## Specify libraries to link a library or executable target against
+target_link_libraries(mpu9250_serial_to_imu_node
+  ${catkin_LIBRARIES}
+)
+
+
+roslaunch_add_file_check(launch)
 
 
 install(PROGRAMS scripts/serial_node.py scripts/MySerialClient.py 

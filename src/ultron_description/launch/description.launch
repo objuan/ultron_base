@@ -15,4 +15,7 @@
     urdf_extras:=$(arg urdf_extras)
     " />
 
+<!-- Activate node to propagate the joint state -->
+ <node name="ultron_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
 </launch>

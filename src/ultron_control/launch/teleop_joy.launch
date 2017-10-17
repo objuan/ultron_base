@@ -1,18 +1,24 @@
 <?xml version="1.0"?>
 <launch>
-
+ <!-- Define arguments -->
+ <arg name="cmd_topic" default="joy_teleop/cmd_vel" />
   <arg name="joy_dev" default="/dev/input/js0" />
-  <arg name="joystick" default="true" />
+  <!--<arg name="joystick" default="true" />-->
 
-  <group ns="joy_teleop">
-
+  <!--<group ns="joy_teleop">-->
+    <!-- Load joystick configuration -->
     <rosparam command="load" file="$(find ultron_control)/config/teleop.yaml" />
-
+    <!-- Joystick node -->
     <node pkg="joy" type="joy_node" name="joy_node">
       <param name="dev" value="$(arg joy_dev)" />
     </node>
+    <!-- Twister node controller -->
+    <node pkg="teleop_twist_joy" type="teleop_node" name="teleop_twist_joy">
+        <remap from="cmd_vel" to="$(arg cmd_topic)"/>
+    </node>
+ <!-- </group>-->
 
-    <node pkg="teleop_twist_joy" type="teleop_node" name="teleop_twist_joy"/>
-  </group>
-
+  <!-- Interactive maker -->
+   <node pkg="interactive_marker_twist_server"
+        type="marker_server" name="twist_marker_server" output="screen"/>
 </launch>

@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2016, Picodex Robotics
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Clearpath Robotics nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<launch>
+  <env name="ROS_LOG_DIR" value="$(find ultron_kernel)/log"/>
+
+ <!-- Launch the IMU  node -->
+  <arg name="imu"          default="false"  />
+ <!-- Launch the DRIVER  node -->
+  <arg name="driver"          default="true"  />
+  <!-- Launch the ZED wrapper node -->
+  <arg name="zed"          default="true"  />
+  <!-- Launch web controller       -->
+  <arg name="web"          default="false" />
+  <!-- Enable/disable 2D mode -->
+  <arg name="two_d_mode"   default="false" />
+  <!-- Enable/Disable sensor fusion -->
+  <arg name="filter"       default="true" />
+  <arg name="filter_fake"       default="true" />
+
+  <arg name="laser_enabled" default="$(optenv ULTRON_LMS1XX_ENABLED false)"/>
+  <arg name="kinect_enabled" default="$(optenv ULTRON_UR5_ENABLED false)"/>
+  <arg name="urdf_extras" default="$(optenv ULTRON_URDF_EXTRAS)"/>
+
+  <!-- USB port selection -->
+    
+  <arg name="port_imu" default="$(optenv ULTRON_PORT_IMU /dev/ttyUSB0)" />
+  <arg name="port_driver" default="$(optenv ULTRON_PORT_BASE /dev/ttyUSB0)" />
+
+  <!-- Launch IMU sensor -->
+  <group if="$(arg imu)">
+	  <include file="$(find ultron_kernel)/launch/include/imu.launch">
+	    <!-- Set TTY IMU controller -->
+	    <arg name="port"             value="$(arg port_imu)"   />
+	  </include>
+  </group>
+
+  <!-- Petrorov arduino driver -->
+  <group if="$(arg driver)">
+        <include file="$(find ultron_kernel)/launch/include/arduino.launch">
+            <arg name="port_driver"             value="$(arg port_driver)"   />
+         </include>
+  </group>
+
+  <!-- Load robot description -->
+  <include file="$(find ultron_description)/launch/description.launch" >
+     <arg name="laser_enabled" default="$(arg laser_enabled)"/>
+     <arg name="kinect_enabled" default="$(arg kinect_enabled)"/>
+     <arg name="urdf_extras" default="$(arg urdf_extras)"/>
+   </include>
+
+  <!-- Petrorov hardware driver -->
+  <node pkg="ultron_kernel" type="ultron_node" name="ultron_node">
+        <rosparam subst_value="true">
+            
+            control_frequency: 10.0
+            diagnostic_frequency: 1.0
+
+            wheel_diameter: 0.15
+
+        </rosparam>
+  </node>
+
+  <!-- Start ZED camera and laser scan -->
+  <group if="$(arg zed)">
+    <include file="$(find ultron_kernel)/launch/include/zed.launch">
+      <!-- Enable/Disable odometry TF from ZED -->
+      <arg name="publish_tf"     value="false" />
+    </include>
+  </group>
+
+  
+
+<!-- Differential controller parameters and basic localization -->
+<include file="$(find ultron_control)/launch/control.launch">
+  <!-- Publish odom TF from motor controller -->
+  <arg name="enable_odom_tf"     value="false" />
+  <!-- Launch filter externally. See below -->
+  <arg name="filter"             value="false" />
+</include>
+
+
+  <!-- Load Sensor fusion filter -->
+  <group if="$(arg filter)">
+    <group unless="$(arg filter_fake)">
+        <include file="$(find ultron_control)/launch/localization.launch">
+          <!-- Enable/Disable 2D mode -->
+          <arg name="two_d_mode" value="$(arg two_d_mode)" />
+        </include>
+     </group>
+     <group if="$(arg filter_fake)">
+         <include file="$(find ultron_control)/launch/localization_fake.launch">
+           <!-- Enable/Disable 2D mode -->
+           <arg name="two_d_mode" value="$(arg two_d_mode)" />
+         </include>
+      </group>
+  </group>
+  
+
+    <!--Teleop -->
+    <!--<include file="$(find ultron_control)/launch/teleop_joy.launch" />-->
+
+    <!-- Diagnostic Aggregator -->
+    <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
+        <rosparam command="load" file="$(find ultron_kernel)/config/diagnostics.yaml"/>
+    </node>
+  
+  <!-- Launch web controller -->
+  <group if="$(arg web)">
+    <include file="$(find ultron_control)/launch/web.launch" />
+  </group>
+  
+</launch>

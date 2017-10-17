@@ -8,6 +8,7 @@
   <xacro:arg name="laser_rpy" default="$(optenv HUSKY_LMS1XX_RPY 0.0 0.0 0.0)" />
 
   <xacro:arg name="kinect_enabled" default="false" />
+  <xacro:arg name="zed_enabled" default="true" />
   <!--<xacro:arg name="kinect_rpy" default="0 0.18 3.1415" />-->
 
   <xacro:arg name="imu_enabled" default="true" />
@@ -23,8 +24,14 @@
   <xacro:include filename="$(find ultron_description)/urdf/accessories/sick_lms1xx_mount.urdf.xacro"/>
   <xacro:include filename="$(find ultron_description)/urdf/accessories/sensor_arch.urdf.xacro"/>
   <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
+  <xacro:include filename="$(find ultron_description)/urdf/zed.urdf.xacro" />
+  <xacro:include filename="$(find ultron_description)/urdf/imu.urdf.xacro" />
 
-  <property name="M_PI" value="3.14159"/>
+  <!-- Global properties -->
+  <xacro:property name="path_meshes" value="package://ultron_description/meshes"/>
+  <xacro:property name="M_PI" value="3.14159"/>
+  <!-- Global properties -->
+
 
   <!-- Base Size -->
   <property name="base_x_size" value="0.45" />
@@ -36,9 +43,16 @@
   <property name="border_y_size" value="0.06" />
 
   <!-- Top Plate -->
-  <property name="top_plate_xy_ray" value="0.155" />
-  <property name="top_plate_z_size" value="0.012" />
-  <property name="top_plate_z_pos" value="0.253" />
+  <property name="top_plate_x_size" value="0.4" />
+  <property name="top_plate_y_size" value="0.34" />
+  <property name="top_plate_z_size" value="0.02" />
+  <property name="top_plate_z_pos" value="0.14" />
+
+  <!-- Verical bar Size -->
+  <property name="bar_x_size" value="0.02" />
+  <property name="bar_y_size" value="0.04" />
+  <property name="bar_z_size" value="1" />
+
 
   <!-- Wheel Mounting Positions -->
   <!-- dimensione del perimetro di attacco delle ruote--> 
@@ -101,7 +115,7 @@
 
     <link name="base_link_platform_right">
         <visual>
-	        <origin xyz="0 0 -${base_z_size/2}" rpy="0 0 0" />
+                <origin xyz="0 0 -${base_z_size/2}" rpy="0 0 0" />
                 <geometry>
                         <box size="${border_x_size} ${border_y_size} ${base_z_size}"/>
                 </geometry>
@@ -125,9 +139,9 @@
 
     <link name="top_plate_link">
         <visual>
-	        <origin xyz="0 0 -${top_plate_z_size/2}" rpy="0 0 0" />
+                <origin xyz="0 0 -${top_plate_z_size/2}" rpy="0 0 0" />
                 <geometry>
-                        <cylinder length="${top_plate_z_size}" radius="${top_plate_xy_ray}"/>
+                        <box size="${top_plate_x_size} ${top_plate_y_size} ${top_plate_z_size}"/>
                 </geometry>
                  <material name="gray">
 		  <color rgba="0.5 0.5 0.5 1"/>
@@ -136,7 +150,7 @@
         <collision>
                 <origin xyz="0 0 -${top_plate_z_size/2}" rpy="0 0 0" />
                 <geometry>
-                         <cylinder length="${top_plate_z_size}" radius="${top_plate_xy_ray}"/>
+                         <box size="${top_plate_x_size} ${top_plate_y_size} ${top_plate_z_size}"/>
                 </geometry>
       </collision>
     </link>
@@ -157,6 +171,36 @@
       <child link="base_footprint" />
     </joint>
 
+<!-- barra verticale -->
+
+<link name="bar_link">
+    <visual>
+        <origin xyz="0 0 ${bar_z_size/2}" rpy="0 0 0" />
+        <geometry>
+              <box size="${bar_x_size} ${bar_y_size} ${bar_z_size}"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0 1 0 1"/>
+        </material>
+      </visual>
+  </link>
+
+  <joint name="bar_join" type="fixed">
+    <!--<xacro:insert_block name="joint_pose"/>-->
+    <parent link="base_link" />
+    <child link="bar_link" />
+    <origin xyz="${-base_x_size/2 + bar_x_size} 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+<!-- barra verticale -->
+
+  <!-- ZED -->
+  <xacro:zed_lidar parent="bar_link">
+    <origin xyz="${-bar_x_size/2} 0 0.675" rpy="0 0 0" />
+  </xacro:zed_lidar>
+  <!-- ZED - END -->
+
     <!-- Interial link stores the robot's inertial information -->
     <link name="inertial_link">
       <inertial>
@@ -175,22 +219,28 @@
     <!-- IMU Link is the standard mounting position for the  IMU.-->
     <!-- Il sistena di asse e' diverso yaw = M_PI-->
     <xacro:if value="$(arg imu_enabled)">
-        <link name="imu_link">
-	        <visual>
-	                <origin xyz="0 0 -0.015" rpy="0 0 0" />
+       <!--<link name="imu_link">
+                <visual>
+                        <origin xyz="0 0 -0.015" rpy="0 0 0" />
                         <geometry>
                                 <box size="0.03 0.03 0.03"/>
                         </geometry>
                          <material name="yellow">
-                  		<color rgba="1 1 0 1"/>
-		         </material>
+                                <color rgba="1 1 0 1"/>
+                         </material>
                 </visual>
         </link>
         <joint name="imu_joint" type="fixed">
                 <origin xyz="0 0 -${base_z_size + 0.01}" rpy="0 0 -${M_PI}" />
                 <parent link="base_link" />
                 <child link="imu_link" />
-       </joint>
+       </joint>-->
+       <!-- IMU -->
+        <xacro:imu parent="base_link">
+         <!-- <origin xyz="0 0 0" rpy="0 ${M_PI/2} 0" /> -->
+          <origin xyz="0 0 0" rpy="0  0 0" />
+        </xacro:imu>
+        <!-- IMU -->
        <gazebo reference="imu_link">
        </gazebo>
    </xacro:if>
