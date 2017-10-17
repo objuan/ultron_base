@@ -19,6 +19,7 @@ roslaunch slam freenect_throttle.launch decimation:=2
 roslaunch slam kinect_scan.launch
 
 
+
 ==========================
 TUTTO SU BERRY
 ==========================

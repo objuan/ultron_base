@@ -122,6 +122,10 @@ Start the move_base demo:
 $ roslaunch ultron_navigation move_base_mapless_demo.launch
 
 
+//SOLO contyrollo
+
+roslaunch ultron_control control_berry.launch
+
 // ==================================
 // DA VEDERE
 // ==================================

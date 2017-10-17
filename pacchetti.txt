@@ -2,10 +2,31 @@
 
 aggiuti  pacchetto 
 
-source /opt/ros/kinetic/setup.bash
+sudo apt-get install ros-kinetic-lms1xx
+
+-sudo apt-get install ros-kinetic-moveit
+-https://github.com/ros-teleop/twist_mux
+
+ source /opt/ros/kinetic/setup.bash
+
+- https://github.com/ros-industrial/universal_robot.git
+tolte dipendenza da muve.it e kinneatic dal paccheto !!!
+
+- https://github.com/cra-ros-pkg/robot_localization.git
+
+- https://github.com/ros-geographic-info/geographic_info.git
+
+- https://github.com/ros-visualization/interactive_marker_twist_server.git
+
+- https://github.com/ros-teleop/teleop_twist_joy.git
+
+SERIAL
+
+https://github.com/wjwwood/serial
 
 
 USO DI SHADOW
+
 
 // ==================================
 // paccketti
@@ -23,39 +44,26 @@ sudo apt-get update
 ros-kinetic-*
 
 sudo apt-get install ros-kinetic-geographic-info
-sudo apt-get install ros-kinetic-rosserial ros-kinetic-rosserial-arduino ros-kinetic-rosserial-client ros-kinetic-rosserial-server  ros-kinetic-serial
-sudo apt-get install ros-kinetic-imu-tools
+sudo apt-get install ros-kinetic-rosserial ros-kinetic-rosserial-arduino ros-kinetic-rosserial-client ros-kinetic-rosserial-server
 
-interactive-marker-twist-server
-multimaster-fkie
-robot-localization
-ros-control
-teleop-twist-joy
-twist-mux
-universal-robot
-ros-kinetic-multimaster-launch
-ros-kinetic-lms1xx
-ros-kinetic-moveit
-ros-kinetic-ros-controllers
-ros-kinetic-imu-transformer-node
-ros-kinetic-joy
-
+/home/marco/catkin_ws/src/geographic_info
+/home/marco/catkin_ws/src/imu_tools
+/home/marco/catkin_ws/src/interactive_marker_twist_server
+/home/marco/catkin_ws/src/multimaster_fkie
+/home/marco/catkin_ws/src/robot_localization
+/home/marco/catkin_ws/src/ros_control
+/home/marco/catkin_ws/src/rosserial
+/home/marco/catkin_ws/src/rosserial
+/home/marco/catkin_ws/src/serial
+/home/marco/catkin_ws/src/teleop_twist_joy
+/home/marco/catkin_ws/src/twist_mux
+ ?? /home/marco/catkin_ws/src/universal_robot
 ?? /home/marco/catkin_ws/src/usb_cam
-
+ros-kinetic-multimaster-launch
+ros-kinetic-serial
+sudo apt-get install ros-kinetic-lms1xx
 sudo apt-get install ros-kinetic-rtabmap
-sudo apt-get install ros-kinetic-rtabmap-ros
-
-
-- https://github.com/ros-industrial/universal_robot.git
-tolte dipendenza da muve.it e kinneatic dal paccheto !!! -> funziona con i pacchetti di base 
-
-// ==================================
-//istallare
-// ==================================
-
-// ==================================
-//istallare
-// ==================================
+istallare
 
 da sudo
 source /home/marco/.bashrc
